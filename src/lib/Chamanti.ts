@@ -40,8 +40,7 @@ export class Chamanti {
     this.gl.createProgram(vertexShader, fragmentShader);
     attributes.forEach(
       ({ name, size, type, normalized, stride, data, offset }) => {
-        const buffer = this.gl.createBuffer(new Float32Array(data));
-        this.gl.bindBuffer(buffer);
+        this.gl.createBuffer(new Float32Array(data));
         this.gl.setAttribute(name, size, type, normalized, stride, offset);
         this.gl.context.drawArrays(
           this.gl.context.TRIANGLES,
