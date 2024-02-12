@@ -68,7 +68,7 @@ export class GL {
   setAttribute(
     attribute: string,
     size: number,
-    type = this.context.FLOAT,
+    type: number = this.context.FLOAT,
     normalized = false,
     stride = 0,
     offset = 0
@@ -78,6 +78,8 @@ export class GL {
       'Error setting attributes. No program created... call createProgram with shaders.'
     );
     const location = this.context.getAttribLocation(this.program, attribute);
+    invariant(location !== -1, `No attribute found with name ${attribute}`);
+
     this.context.vertexAttribPointer(
       location,
       size,
