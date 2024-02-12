@@ -1,16 +1,19 @@
-import { Attribute, Uniform } from '.';
+import { RenderDataObject } from '.';
 import { GL } from './GL';
+import { Renderer } from './Renderer';
 import fragmentShader from './shaders/triangleFragment.glsl';
 import vertexShader from './shaders/triangleVertex.glsl';
 import { invariant } from './utils';
 
 export class Chamanti {
   gl: GL;
-  constructor(canvas: HTMLCanvasElement) {
+  renderer: Renderer;
+  constructor(canvas: HTMLCanvasElement, renderer?: Renderer) {
     const context = canvas.getContext('webgl2') || canvas.getContext('webgl');
     invariant(!!context, 'No WebGL available');
 
     this.gl = new GL(context);
+    this.renderer = renderer ?? new Renderer(this.gl);
   }
 
   drawTriangle(data: number[]) {
@@ -25,12 +28,7 @@ export class Chamanti {
     this.gl.context.drawArrays(this.gl.context.TRIANGLES, 0, 3);
   }
 
-  drawBuffer(options: {
-    vertexShader: string;
-    fragmentShader: string;
-    attributes?: Attribute[];
-    uniforms?: Uniform[];
-  }) {
+  drawBuffer(options: RenderDataObject) {
     const {
       attributes = [],
       uniforms = [],

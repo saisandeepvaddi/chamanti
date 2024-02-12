@@ -14,3 +14,10 @@ export type Uniform = {
   name: string;
   value: number | boolean | number[] | Float32Array;
 };
+
+export type RenderDataObject = {
+  vertexShader: string;
+  fragmentShader: string;
+  attributes?: Attribute[];
+  uniforms?: Uniform[];
+};

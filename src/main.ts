@@ -9,7 +9,8 @@ const chamanti = new Chamanti(canvas);
 const triangleData = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
 const vertexColors = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
 
-chamanti.drawBuffer({
+const renderer = chamanti.renderer;
+renderer.addBufferedObject({
   attributes: [
     { name: 'aPosition', size: 3, data: triangleData },
     { name: 'aColor', size: 3, data: vertexColors },
@@ -18,3 +19,5 @@ chamanti.drawBuffer({
   vertexShader,
   fragmentShader,
 });
+
+renderer.render();
