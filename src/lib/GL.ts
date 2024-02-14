@@ -49,6 +49,14 @@ export class GL {
     return this.program;
   }
 
+  useProgram() {
+    invariant(
+      !!this.program,
+      'Error using program. No program created... call createProgram with shaders.'
+    );
+    this.context.useProgram(this.program);
+  }
+
   createBuffer(data: Float32Array) {
     const buffer = this.context.createBuffer();
     invariant(!!buffer, 'Error binding buffers. WebGL createBuffer failed');

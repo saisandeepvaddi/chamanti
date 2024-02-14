@@ -10,14 +10,34 @@ const triangleData = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
 const vertexColors = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
 
 const renderer = chamanti.renderer;
-renderer.addBufferedObject({
+const { updateUniform } = renderer.addBufferObject({
+  name: 'triangle',
   attributes: [
     { name: 'aPosition', size: 3, data: triangleData },
     { name: 'aColor', size: 3, data: vertexColors },
   ],
-  uniforms: [],
+  uniforms: [
+    {
+      name: 'uTime',
+      value: 0,
+    },
+  ],
   vertexShader,
   fragmentShader,
 });
 
 renderer.render();
+
+// setInterval(() => {
+//   updateUniform('uTime', renderer.elapsedTime);
+// }, 1000);
+
+// renderer.startRenderLoop();
+const start = Date.now();
+function animate() {
+  requestAnimationFrame(animate);
+  updateUniform('uTime', Math.sin((Date.now() - start) / 100));
+  renderer.render();
+}
+
+// animate();

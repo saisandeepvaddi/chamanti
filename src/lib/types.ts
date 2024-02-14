@@ -15,7 +15,8 @@ export type Uniform = {
   value: number | boolean | number[] | Float32Array;
 };
 
-export type RenderDataObject = {
+export type BufferObject = {
+  name: string;
   vertexShader: string;
   fragmentShader: string;
   attributes?: Attribute[];
