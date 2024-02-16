@@ -33,11 +33,11 @@ renderer.render();
 // }, 1000);
 
 // renderer.startRenderLoop();
-const start = Date.now();
+const start = performance.now();
 function animate() {
   requestAnimationFrame(animate);
-  updateUniform('uTime', Math.sin((Date.now() - start) / 100));
+  updateUniform('uTime', Math.sin((performance.now() - start) / 1000));
   renderer.render();
 }
 
-// animate();
+animate();

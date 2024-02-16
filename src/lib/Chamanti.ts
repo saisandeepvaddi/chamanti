@@ -26,28 +26,4 @@ export class Chamanti {
     this.gl.setAttribute('aPosition', 3, this.gl.context.FLOAT, false, 0, 0);
     this.gl.context.drawArrays(this.gl.context.TRIANGLES, 0, 3);
   }
-
-  // drawBuffer(options: BufferObject) {
-  //   const {
-  //     attributes = [],
-  //     uniforms = [],
-  //     vertexShader,
-  //     fragmentShader,
-  //   } = options;
-  //   this.gl.createProgram(vertexShader, fragmentShader);
-  //   attributes.forEach(
-  //     ({ name, size, type, normalized, stride, data, offset }) => {
-  //       this.gl.createBuffer(new Float32Array(data));
-  //       this.gl.setAttribute(name, size, type, normalized, stride, offset);
-  //       this.gl.context.drawArrays(
-  //         this.gl.context.TRIANGLES,
-  //         0,
-  //         data.length / size
-  //       );
-  //     }
-  //   );
-  //   uniforms.forEach(({ name, value }) => {
-  //     this.gl.setUniform(name, value);
-  //   });
-  // }
 }

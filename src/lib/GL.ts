@@ -15,6 +15,7 @@ export class GL {
     this.context.shaderSource(shader, source);
     this.context.compileShader(shader);
     if (!this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)) {
+      this.context.deleteShader(shader);
       throw new Error(
         `Error compiling shader: ${this.context.getShaderInfoLog(shader)}`
       );
