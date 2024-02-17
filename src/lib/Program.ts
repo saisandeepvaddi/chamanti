@@ -75,9 +75,7 @@ export class Program {
       this.attributes.get(attribute) ??
       this.context.getAttribLocation(this._program, attribute);
 
-    if (!this.attributes.has(attribute)) {
-      this.attributes.set(attribute, location);
-    }
+    this.attributes.set(attribute, location);
 
     return location;
   }

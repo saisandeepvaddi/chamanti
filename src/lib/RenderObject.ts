@@ -21,9 +21,16 @@ export class RenderObject {
     this.name = name;
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
+
+    this.setupBuffers = this.setupBuffers.bind(this);
+    this.updateBuffers = this.updateBuffers.bind(this);
+    this.updateUniform = this.updateUniform.bind(this);
+    this.updateAttribute = this.updateAttribute.bind(this);
+    this.remove = this.remove.bind(this);
+    this.draw = this.draw.bind(this);
   }
 
-  createBuffer(name: string) {
+  private createBuffer(name: string) {
     // if (State.webglVersion === 2) {
     //   const vao =
     //     this.vao ??
