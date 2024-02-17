@@ -2,8 +2,6 @@ import { GLContext } from '.';
 import { GL } from './GL';
 import { Renderer } from './Renderer';
 import { State } from './config';
-import fragmentShader from './shaders/triangleFragment.glsl';
-import vertexShader from './shaders/triangleVertex.glsl';
 import { invariant } from './utils';
 
 export type ChamantiOptions = {
@@ -41,17 +39,5 @@ export class Chamanti {
 
     this.gl = new GL(context);
     this.renderer = options.renderer ?? new Renderer(this.gl);
-  }
-
-  drawTriangle(data: number[]) {
-    invariant(
-      data.length === 9,
-      'Invalid data length for triangle. Must be 9 floats.'
-    );
-
-    this.gl.createProgram(vertexShader, fragmentShader);
-    this.gl.createBuffer(new Float32Array(data));
-    this.gl.setAttribute('aPosition', 3, this.gl.context.FLOAT, false, 0, 0);
-    this.gl.context.drawArrays(this.gl.context.TRIANGLES, 0, 3);
   }
 }

@@ -44,14 +44,41 @@ export class Renderer {
     this.startRenderLoop();
   }
 
-  addBufferObject(object: BufferObject, autoRender = false) {
-    this.gl.createProgram(object.vertexShader, object.fragmentShader);
-    this.gl.useProgram();
+  private setupBuffers(options: BufferObject) {
+    const { attributes = [], uniforms = [] } = options;
 
+    attributes.forEach(({ name, size, type, normalized, stride, offset }) => {
+      this.gl.setAttribute(name, size, type, normalized, stride, offset);
+      this.gl.createBuffer(name);
+    });
+    uniforms.forEach(({ name, value }) => {
+      this.gl.setUniform(name, value);
+    });
+  }
+
+  private updateBuffers(options: BufferObject) {
+    const { attributes = [], uniforms = [] } = options;
+
+    attributes.forEach(
+      ({ name, data, size, normalized, offset, stride, type }) => {
+        this.gl.updateBuffer(name, new Float32Array(data));
+        this.gl.setAttribute(name, size, type, normalized, stride, offset);
+      }
+    );
+
+    uniforms.forEach(({ name, value }) => {
+      this.gl.setUniform(name, value);
+    });
+  }
+
+  addBufferObject(object: BufferObject) {
+    const program = this.gl.createProgram(
+      object.vertexShader,
+      object.fragmentShader
+    );
+    this.setupBuffers(object);
     this.renderObjects.push(object);
-    if (autoRender) {
-      this.startRenderLoop();
-    }
+
     return {
       updateAttribute: (name: string, data: number[]) => {
         this.updateAttribute(object.name, name, data);
@@ -63,24 +90,14 @@ export class Renderer {
         this.renderObjects = this.renderObjects.filter(
           (renderObject) => renderObject !== object
         );
+        program.delete();
         this.startRenderLoop();
       },
     };
   }
 
   private drawBuffer(options: BufferObject) {
-    const { attributes = [], uniforms = [] } = options;
-
-    attributes.forEach(
-      ({ name, size, type, normalized, stride, data, offset }) => {
-        this.gl.createBuffer(new Float32Array(data));
-        this.gl.setAttribute(name, size, type, normalized, stride, offset);
-      }
-    );
-
-    uniforms.forEach(({ name, value }) => {
-      this.gl.setUniform(name, value);
-    });
+    const { attributes = [] } = options;
 
     if (attributes.length > 0) {
       const count = attributes[0].data.length / attributes[0].size;
@@ -90,10 +107,13 @@ export class Renderer {
 
   render(deltaTime: number = 0) {
     this.gl.context.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.gl.context.clear(this.gl.context.COLOR_BUFFER_BIT);
+    this.gl.context.clear(
+      this.gl.context.COLOR_BUFFER_BIT | this.gl.context.DEPTH_BUFFER_BIT
+    );
 
     this.renderObjects.forEach((object) => {
-      // console.log(object.uniforms?.[0].value);
+      this.gl.useProgram();
+      this.updateBuffers(object);
       this.drawBuffer(object);
     });
   }

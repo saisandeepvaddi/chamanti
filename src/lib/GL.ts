@@ -1,5 +1,5 @@
 import { Program } from './Program';
-import { State } from './config';
+// import { State } from './config';
 import { GLContext } from './types';
 import { invariant } from './utils';
 
@@ -7,6 +7,8 @@ export class GL {
   context: GLContext;
   private program: Program | null = null;
   private vao: WebGLVertexArrayObject | null = null;
+
+  private buffers: Map<string, WebGLBuffer> = new Map();
   constructor(context: GLContext) {
     this.context = context;
   }
@@ -25,32 +27,33 @@ export class GL {
     this.program.use();
   }
 
-  createBuffer(data: Float32Array) {
-    if (State.webglVersion === 2) {
-      const vao =
-        this.vao ??
-        (this.context as WebGL2RenderingContext).createVertexArray();
-      invariant(!!vao, 'Error creating vertex array object');
-      (this.context as WebGL2RenderingContext).bindVertexArray(vao);
-      this.vao = vao;
-      (this.context as WebGL2RenderingContext).bindVertexArray(vao);
-    }
+  createBuffer(name: string) {
+    // if (State.webglVersion === 2) {
+    //   const vao =
+    //     this.vao ??
+    //     (this.context as WebGL2RenderingContext).createVertexArray();
+    //   invariant(!!vao, 'Error creating vertex array object');
+    //   this.vao = vao;
+    //   (this.context as WebGL2RenderingContext).bindVertexArray(vao);
+    // }
 
-    const buffer = this.context.createBuffer();
+    const buffer = this.buffers.get(name) ?? this.context.createBuffer();
     invariant(!!buffer, 'Error binding buffers. WebGL createBuffer failed');
+    this.buffers.set(name, buffer);
+    return buffer;
+  }
 
+  updateBuffer(name: string, data: Float32Array) {
+    const buffer = this.buffers.get(name);
+    invariant(!!buffer, `No buffer found with name ${name}`);
     this.context.bindBuffer(this.context.ARRAY_BUFFER, buffer);
     this.context.bufferData(
       this.context.ARRAY_BUFFER,
       data,
       this.context.STATIC_DRAW
     );
+  }
 
-    return buffer;
-  }
-  bindBuffer(buffer: WebGLBuffer) {
-    this.context.bindBuffer(this.context.ARRAY_BUFFER, buffer);
-  }
   setAttribute(
     attribute: string,
     size: number,

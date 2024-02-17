@@ -100,4 +100,10 @@ export class Program {
 
     return location;
   }
+
+  delete() {
+    this.context.deleteProgram(this._program);
+    this.context.deleteShader(this._vertexShader);
+    this.context.deleteShader(this._fragmentShader);
+  }
 }
