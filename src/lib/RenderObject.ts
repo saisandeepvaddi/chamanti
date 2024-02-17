@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { Attribute, BufferObject, GL, GLContext, Uniform, invariant } from '.';
+import { Attribute, BufferObject, GLContext, Uniform, invariant } from '.';
 import { Program } from './Program';
 export class RenderObject {
   id = uuid();
@@ -11,7 +11,6 @@ export class RenderObject {
 
   buffers: Map<string, WebGLBuffer> = new Map();
   constructor(
-    gl: GL,
     context: GLContext,
     { name, vertexShader, fragmentShader, attributes, uniforms }: BufferObject
   ) {

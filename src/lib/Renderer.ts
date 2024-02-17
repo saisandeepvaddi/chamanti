@@ -1,15 +1,13 @@
-import { BufferObject, GL, GLContext } from './';
+import { BufferObject, GLContext } from './';
 import { RenderObject } from './RenderObject';
 
 export class Renderer {
-  gl: GL;
   elapsedTime: number = 0;
   prevFrameTime: number = 0;
   renderObjects: Map<string, RenderObject> = new Map();
   rafId: number | null = null;
   context: GLContext;
-  constructor(gl: GL, context: GLContext) {
-    this.gl = gl;
+  constructor(context: GLContext) {
     this.context = context;
 
     this.startRenderLoop = this.startRenderLoop.bind(this);
@@ -30,7 +28,7 @@ export class Renderer {
   }
 
   addBufferObject(object: BufferObject) {
-    const renderObject = new RenderObject(this.gl, this.context, object);
+    const renderObject = new RenderObject(this.context, object);
     this.renderObjects.set(renderObject.id, renderObject);
 
     renderObject.setupBuffers();
@@ -39,9 +37,9 @@ export class Renderer {
   }
 
   render(deltaTime: number = 0) {
-    this.gl.context.clearColor(0.0, 0.0, 0.0, 1.0);
-    this.gl.context.clear(
-      this.gl.context.COLOR_BUFFER_BIT | this.gl.context.DEPTH_BUFFER_BIT
+    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.context.clear(
+      this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT
     );
 
     for (const renderObject of this.renderObjects.values()) {

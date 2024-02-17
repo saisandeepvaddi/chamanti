@@ -1,5 +1,4 @@
 import { GLContext } from '.';
-import { GL } from './GL';
 import { Renderer } from './Renderer';
 import { State } from './config';
 import { invariant } from './utils';
@@ -10,7 +9,6 @@ export type ChamantiOptions = {
 };
 
 export class Chamanti {
-  gl: GL;
   renderer: Renderer;
   constructor(
     canvas: HTMLCanvasElement,
@@ -37,7 +35,6 @@ export class Chamanti {
 
     invariant(!!context, 'No WebGL context available in your browser.');
 
-    this.gl = new GL(context);
-    this.renderer = options.renderer ?? new Renderer(this.gl, context);
+    this.renderer = options.renderer ?? new Renderer(context);
   }
 }
