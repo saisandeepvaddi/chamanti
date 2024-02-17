@@ -19,14 +19,6 @@ export class GL {
     return this.program;
   }
 
-  useProgram() {
-    invariant(
-      !!this.program,
-      'No program created... call createProgram with shaders.'
-    );
-    this.program.use();
-  }
-
   createBuffer(name: string) {
     // if (State.webglVersion === 2) {
     //   const vao =

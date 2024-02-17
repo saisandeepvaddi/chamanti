@@ -1,13 +1,16 @@
-import { BufferObject, GL, invariant } from './';
+import { BufferObject, GL, GLContext } from './';
+import { RenderObject } from './BufferObject';
 
 export class Renderer {
   gl: GL;
   elapsedTime: number = 0;
   prevFrameTime: number = 0;
-  renderObjects: BufferObject[] = [];
+  renderObjects: Map<string, RenderObject> = new Map();
   rafId: number | null = null;
-  constructor(gl: GL) {
+  context: GLContext;
+  constructor(gl: GL, context: GLContext) {
     this.gl = gl;
+    this.context = context;
   }
   startRenderLoop() {
     if (this.rafId) {
@@ -23,26 +26,26 @@ export class Renderer {
     this.rafId = requestAnimationFrame(animate);
   }
 
-  updateAttribute(objectName: string, attributeName: string, data: number[]) {
-    const object = this.renderObjects.find((o) => o.name === objectName);
-    invariant(!!object, `Object ${objectName} not found`);
+  // updateAttribute(objectName: string, attributeName: string, data: number[]) {
+  //   const object = this.renderObjects.find((o) => o.name === objectName);
+  //   invariant(!!object, `Object ${objectName} not found`);
 
-    const attribute = object.attributes?.find((a) => a.name === attributeName);
-    invariant(!!attribute, `Attribute ${attributeName} not found`);
+  //   const attribute = object.attributes?.find((a) => a.name === attributeName);
+  //   invariant(!!attribute, `Attribute ${attributeName} not found`);
 
-    attribute.data = data;
-    this.startRenderLoop();
-  }
+  //   attribute.data = data;
+  //   this.startRenderLoop();
+  // }
 
-  updateUniform(objectName: string, uniformName: string, value: number) {
-    const object = this.renderObjects.find((o) => o.name === objectName);
-    invariant(!!object, `Object ${objectName} not found`);
+  // updateUniform(objectName: string, uniformName: string, value: number) {
+  //   const object = this.renderObjects.find((o) => o.name === objectName);
+  //   invariant(!!object, `Object ${objectName} not found`);
 
-    const uniform = object.uniforms?.find((u) => u.name === uniformName);
-    invariant(!!uniform, `Uniform ${uniformName} not found`);
-    uniform.value = value;
-    this.startRenderLoop();
-  }
+  //   const uniform = object.uniforms?.find((u) => u.name === uniformName);
+  //   invariant(!!uniform, `Uniform ${uniformName} not found`);
+  //   uniform.value = value;
+  //   this.startRenderLoop();
+  // }
 
   private setupBuffers(options: BufferObject) {
     const { attributes = [], uniforms = [] } = options;
@@ -72,38 +75,28 @@ export class Renderer {
   }
 
   addBufferObject(object: BufferObject) {
-    const program = this.gl.createProgram(
-      object.vertexShader,
-      object.fragmentShader
-    );
-    this.setupBuffers(object);
-    this.renderObjects.push(object);
+    const renderObject = new RenderObject(this.gl, this.context, object);
+    this.renderObjects.set(renderObject.id, renderObject);
+    // const program = this.gl.createProgram(
+    //   object.vertexShader,
+    //   object.fragmentShader
+    // );
+    // this.setupBuffers(object);
+    // this.renderObjects.push(object);
 
-    return {
-      updateAttribute: (name: string, data: number[]) => {
-        this.updateAttribute(object.name, name, data);
-      },
-      updateUniform: (name: string, value: number) => {
-        this.updateUniform(object.name, name, value);
-      },
-      remove: () => {
-        this.renderObjects = this.renderObjects.filter(
-          (renderObject) => renderObject !== object
-        );
-        program.delete();
-        this.startRenderLoop();
-      },
-    };
+    renderObject.setupBuffers();
+
+    return renderObject;
   }
 
-  private drawBuffer(options: BufferObject) {
-    const { attributes = [] } = options;
+  // private drawBuffer(options: BufferObject) {
+  //   const { attributes = [] } = options;
 
-    if (attributes.length > 0) {
-      const count = attributes[0].data.length / attributes[0].size;
-      this.gl.context.drawArrays(this.gl.context.TRIANGLES, 0, count);
-    }
-  }
+  //   if (attributes.length > 0) {
+  //     const count = attributes[0].data.length / attributes[0].size;
+  //     this.gl.context.drawArrays(this.gl.context.TRIANGLES, 0, count);
+  //   }
+  // }
 
   render(deltaTime: number = 0) {
     this.gl.context.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -111,10 +104,10 @@ export class Renderer {
       this.gl.context.COLOR_BUFFER_BIT | this.gl.context.DEPTH_BUFFER_BIT
     );
 
-    this.renderObjects.forEach((object) => {
-      this.gl.useProgram();
-      this.updateBuffers(object);
-      this.drawBuffer(object);
-    });
+    for (const renderObject of this.renderObjects.values()) {
+      renderObject.program.use();
+      renderObject.updateBuffers();
+      renderObject.draw();
+    }
   }
 }

@@ -94,9 +94,7 @@ export class Program {
 
     invariant(!!location, `No uniform found with name ${uniform}`);
 
-    if (!this.uniforms.has(uniform)) {
-      this.uniforms.set(uniform, location);
-    }
+    this.uniforms.set(uniform, location);
 
     return location;
   }

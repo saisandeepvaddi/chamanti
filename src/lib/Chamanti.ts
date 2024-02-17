@@ -38,6 +38,6 @@ export class Chamanti {
     invariant(!!context, 'No WebGL context available in your browser.');
 
     this.gl = new GL(context);
-    this.renderer = options.renderer ?? new Renderer(this.gl);
+    this.renderer = options.renderer ?? new Renderer(this.gl, context);
   }
 }
