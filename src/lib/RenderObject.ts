@@ -25,6 +25,10 @@ export class RenderObject {
     this.updateBuffers = this.updateBuffers.bind(this);
     this.updateUniform = this.updateUniform.bind(this);
     this.updateAttribute = this.updateAttribute.bind(this);
+    this.setAttribute = this.setAttribute.bind(this);
+    this.setUniform = this.setUniform.bind(this);
+    this.updateBuffer = this.updateBuffer.bind(this);
+    this.createBuffer = this.createBuffer.bind(this);
     this.remove = this.remove.bind(this);
     this.draw = this.draw.bind(this);
   }

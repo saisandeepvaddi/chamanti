@@ -2,9 +2,9 @@ import { GLContext, invariant } from '.';
 
 export class Program {
   context: GLContext;
-  private _program: WebGLProgram;
-  private _vertexShader: WebGLShader;
-  private _fragmentShader: WebGLShader;
+  private program: WebGLProgram;
+  private vertexShader: WebGLShader;
+  private fragmentShader: WebGLShader;
   private attributes: Map<string, GLint> = new Map();
   private uniforms: Map<string, WebGLUniformLocation> = new Map();
 
@@ -14,12 +14,12 @@ export class Program {
     fragmentSource: string
   ) {
     this.context = context;
-    this._vertexShader = this.shader(vertexSource, this.context.VERTEX_SHADER);
-    this._fragmentShader = this.shader(
+    this.vertexShader = this.shader(vertexSource, this.context.VERTEX_SHADER);
+    this.fragmentShader = this.shader(
       fragmentSource,
       this.context.FRAGMENT_SHADER
     );
-    this._program = this.create();
+    this.program = this.create();
   }
 
   private shader(source: string, type: number) {
@@ -38,20 +38,20 @@ export class Program {
   }
 
   private create() {
-    invariant(!!this._vertexShader, 'Invalid Vertex Shader');
-    invariant(!!this._fragmentShader, 'Invalid Fragment Shader');
+    invariant(!!this.vertexShader, 'Invalid Vertex Shader');
+    invariant(!!this.fragmentShader, 'Invalid Fragment Shader');
 
     const program = this.context.createProgram();
 
     invariant(!!program, 'WebGL createProgram failed');
 
-    this.context.attachShader(program, this._vertexShader);
-    this.context.attachShader(program, this._fragmentShader);
+    this.context.attachShader(program, this.vertexShader);
+    this.context.attachShader(program, this.fragmentShader);
     this.context.linkProgram(program);
 
     if (!this.context.getProgramParameter(program, this.context.LINK_STATUS)) {
       throw new Error(
-        `Error linking webgl program: ${this.context.getProgramInfoLog(this._program)}`
+        `Error linking webgl program: ${this.context.getProgramInfoLog(this.program)}`
       );
     }
 
@@ -60,20 +60,20 @@ export class Program {
 
   use() {
     invariant(
-      !!this._program,
+      !!this.program,
       'Error using program. No program created... call createProgram with shaders.'
     );
-    this.context.useProgram(this._program);
+    this.context.useProgram(this.program);
   }
 
   getAttributeLocation(attribute: string): number {
     invariant(
-      !!this._program,
+      !!this.program,
       'Error setting attributes. No program created... call createProgram with shaders.'
     );
     const location =
       this.attributes.get(attribute) ??
-      this.context.getAttribLocation(this._program, attribute);
+      this.context.getAttribLocation(this.program, attribute);
 
     this.attributes.set(attribute, location);
 
@@ -82,13 +82,13 @@ export class Program {
 
   getUniformLocation(uniform: string): WebGLUniformLocation {
     invariant(
-      !!this._program,
+      !!this.program,
       'Error setting uniforms. No program created... call createProgram with shaders.'
     );
 
     const location =
       this.uniforms.get(uniform) ??
-      this.context.getUniformLocation(this._program, uniform);
+      this.context.getUniformLocation(this.program, uniform);
 
     invariant(!!location, `No uniform found with name ${uniform}`);
 
@@ -98,8 +98,8 @@ export class Program {
   }
 
   delete() {
-    this.context.deleteProgram(this._program);
-    this.context.deleteShader(this._vertexShader);
-    this.context.deleteShader(this._fragmentShader);
+    this.context.deleteProgram(this.program);
+    this.context.deleteShader(this.vertexShader);
+    this.context.deleteShader(this.fragmentShader);
   }
 }
