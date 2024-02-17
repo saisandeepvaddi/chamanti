@@ -36,7 +36,7 @@ export class Renderer {
     return renderObject;
   }
 
-  render(deltaTime: number = 0) {
+  render(_deltaTime: number = 0) {
     this.context.clearColor(0.0, 0.0, 0.0, 1.0);
     this.context.clear(
       this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT

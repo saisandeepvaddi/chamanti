@@ -6,11 +6,11 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 const chamanti = new Chamanti(canvas);
 
-const triangleData1 = [-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0];
+const triangleData1 = [-0.5, -0.5, 0, -0.5, 0.5, 0, 0.5, 0.5, 0, 0.5, -0.5, 0];
 const vertexColors1 = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
 
-const triangleData2 = [0.5, 0.5, 0.0, 0.75, -0.75, 0.0, 0.0, 0.75, 0.0];
-const vertexColors2 = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0];
+// const triangleData2 = [0.5, 0.5, 0.0, 0.75, -0.75, 0.0, 0.0, 0.75, 0.0];
+// const vertexColors2 = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0];
 
 const renderer = chamanti.renderer;
 const { updateUniform: updateUniform1 } = renderer.addBufferObject({
@@ -29,23 +29,23 @@ const { updateUniform: updateUniform1 } = renderer.addBufferObject({
   fragmentShader,
 });
 
-const { updateUniform: updateUniform2 } = renderer.addBufferObject({
-  name: 'triangle2',
-  attributes: [
-    { name: 'aPosition', size: 3, data: triangleData2 },
-    { name: 'aColor', size: 3, data: vertexColors2 },
-  ],
-  uniforms: [
-    {
-      name: 'uTime',
-      value: 0,
-    },
-  ],
-  vertexShader,
-  fragmentShader,
-});
+// const { updateUniform: updateUniform2 } = renderer.addBufferObject({
+//   name: 'triangle2',
+//   attributes: [
+//     { name: 'aPosition', size: 3, data: triangleData2 },
+//     { name: 'aColor', size: 3, data: vertexColors2 },
+//   ],
+//   uniforms: [
+//     {
+//       name: 'uTime',
+//       value: 0,
+//     },
+//   ],
+//   vertexShader,
+//   fragmentShader,
+// });
 
-renderer.render();
+// renderer.render();
 
 // remove1();
 
@@ -58,7 +58,7 @@ const start = performance.now();
 function animate() {
   requestAnimationFrame(animate);
   updateUniform1('uTime', Math.sin((performance.now() - start) / 1000));
-  updateUniform2('uTime', Math.sin((performance.now() - start) / 500));
+  // updateUniform2('uTime', Math.sin((performance.now() - start) / 500));
   renderer.render();
 }
 

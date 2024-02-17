@@ -63,8 +63,8 @@ export class RenderObject {
   setupBuffers() {
     this.attributes.forEach(
       ({ name, size, type, normalized, stride, offset }) => {
-        this.setAttribute(name, size, type, normalized, stride, offset);
         this.createBuffer(name);
+        this.setAttribute(name, size, type, normalized, stride, offset);
       }
     );
 
