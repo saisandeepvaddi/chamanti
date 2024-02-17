@@ -2,7 +2,6 @@ import { BufferObject, GL, invariant } from './';
 
 export class Renderer {
   gl: GL;
-
   elapsedTime: number = 0;
   prevFrameTime: number = 0;
   renderObjects: BufferObject[] = [];
@@ -46,6 +45,9 @@ export class Renderer {
   }
 
   addBufferObject(object: BufferObject, autoRender = false) {
+    this.gl.createProgram(object.vertexShader, object.fragmentShader);
+    this.gl.useProgram();
+
     this.renderObjects.push(object);
     if (autoRender) {
       this.startRenderLoop();
@@ -66,15 +68,8 @@ export class Renderer {
     };
   }
 
-  drawBuffer(options: BufferObject) {
-    const {
-      attributes = [],
-      uniforms = [],
-      vertexShader,
-      fragmentShader,
-    } = options;
-
-    this.gl.createProgram(vertexShader, fragmentShader);
+  private drawBuffer(options: BufferObject) {
+    const { attributes = [], uniforms = [] } = options;
 
     attributes.forEach(
       ({ name, size, type, normalized, stride, data, offset }) => {
@@ -82,6 +77,7 @@ export class Renderer {
         this.gl.setAttribute(name, size, type, normalized, stride, offset);
       }
     );
+
     uniforms.forEach(({ name, value }) => {
       this.gl.setUniform(name, value);
     });

@@ -1,64 +1,41 @@
+import { Program } from './Program';
+import { State } from './config';
 import { GLContext } from './types';
 import { invariant } from './utils';
 
 export class GL {
   context: GLContext;
-  private program: WebGLProgram | null = null;
+  private program: Program | null = null;
+  private vao: WebGLVertexArrayObject | null = null;
   constructor(context: GLContext) {
     this.context = context;
   }
 
-  shader(source: string, type: number) {
-    const shader = this.context.createShader(type);
-    invariant(!!shader, 'createShader failed');
-
-    this.context.shaderSource(shader, source);
-    this.context.compileShader(shader);
-    if (!this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)) {
-      this.context.deleteShader(shader);
-      throw new Error(
-        `Error compiling shader: ${this.context.getShaderInfoLog(shader)}`
-      );
-    }
-    return shader;
-  }
-
   createProgram(vertexSource: string, fragmentSource: string) {
-    const vertexShader = this.shader(vertexSource, this.context.VERTEX_SHADER);
-    const fragmentShader = this.shader(
-      fragmentSource,
-      this.context.FRAGMENT_SHADER
-    );
-
-    this.program = this.context.createProgram();
+    this.program = new Program(this.context, vertexSource, fragmentSource);
     invariant(!!this.program, 'WebGL createProgram failed');
-
-    this.context.attachShader(this.program, vertexShader);
-    this.context.attachShader(this.program, fragmentShader);
-    this.context.linkProgram(this.program);
-
-    if (
-      !this.context.getProgramParameter(this.program, this.context.LINK_STATUS)
-    ) {
-      throw new Error(
-        `Error linking webgl program: ${this.context.getProgramInfoLog(this.program)}`
-      );
-    }
-
-    this.context.useProgram(this.program);
-
     return this.program;
   }
 
   useProgram() {
     invariant(
       !!this.program,
-      'Error using program. No program created... call createProgram with shaders.'
+      'No program created... call createProgram with shaders.'
     );
-    this.context.useProgram(this.program);
+    this.program.use();
   }
 
   createBuffer(data: Float32Array) {
+    if (State.webglVersion === 2) {
+      const vao =
+        this.vao ??
+        (this.context as WebGL2RenderingContext).createVertexArray();
+      invariant(!!vao, 'Error creating vertex array object');
+      (this.context as WebGL2RenderingContext).bindVertexArray(vao);
+      this.vao = vao;
+      (this.context as WebGL2RenderingContext).bindVertexArray(vao);
+    }
+
     const buffer = this.context.createBuffer();
     invariant(!!buffer, 'Error binding buffers. WebGL createBuffer failed');
 
@@ -86,7 +63,7 @@ export class GL {
       !!this.program,
       'Error setting attributes. No program created... call createProgram with shaders.'
     );
-    const location = this.context.getAttribLocation(this.program, attribute);
+    const location = this.program.getAttributeLocation(attribute);
     invariant(location !== -1, `No attribute found with name ${attribute}`);
 
     this.context.vertexAttribPointer(
@@ -107,7 +84,7 @@ export class GL {
       !!this.program,
       'Error setting uniforms. No program created... call createProgram with shaders.'
     );
-    const location = this.context.getUniformLocation(this.program, uniform);
+    const location = this.program.getUniformLocation(uniform);
     invariant(!!location, `No uniform found with name ${uniform}`);
     switch (typeof value) {
       case 'number':
