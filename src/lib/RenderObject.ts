@@ -185,10 +185,6 @@ export class RenderObject {
       const count = this.attributes[0].data.length / this.attributes[0].size;
       this.context.drawArrays(this.context.TRIANGLES, 0, count);
     }
-    const error = this.context.getError();
-    if (error !== this.context.NO_ERROR) {
-      console.error('WebGL Error:', error);
-    }
   }
 
   remove() {
