@@ -29,10 +29,10 @@ export class Renderer {
 
   addBufferObject(object: BufferObject) {
     const renderObject = new RenderObject(this.context, object);
-    this.renderObjects.set(renderObject.id, renderObject);
 
     renderObject.setup();
 
+    this.renderObjects.set(renderObject.id, renderObject);
     return renderObject;
   }
 
@@ -43,7 +43,6 @@ export class Renderer {
     );
 
     for (const renderObject of this.renderObjects.values()) {
-      renderObject.update();
       renderObject.draw();
     }
   }

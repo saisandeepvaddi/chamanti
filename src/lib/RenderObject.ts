@@ -161,8 +161,10 @@ export class RenderObject {
 
   setup() {
     this.program.use();
+
     const vao = this.vao ?? this.context.createVertexArray();
     invariant(!!vao, 'Error creating vertex array object');
+
     this.vao = vao;
     this.context.bindVertexArray(vao);
     this.setupAttributes();
@@ -172,17 +174,20 @@ export class RenderObject {
 
   update() {
     this.program.use();
-
     this.context.bindVertexArray(this.vao);
     this.updateAttributes();
     this.updateUniforms();
-    this.context.bindVertexArray(null);
   }
 
   draw() {
+    this.update();
     if (this.attributes.length > 0) {
       const count = this.attributes[0].data.length / this.attributes[0].size;
       this.context.drawArrays(this.context.TRIANGLES, 0, count);
+    }
+    const error = this.context.getError();
+    if (error !== this.context.NO_ERROR) {
+      console.error('WebGL Error:', error);
     }
   }
 
