@@ -43,7 +43,6 @@ export class Renderer {
     );
 
     for (const renderObject of this.renderObjects.values()) {
-      renderObject.program.use();
       renderObject.update();
       renderObject.draw();
     }

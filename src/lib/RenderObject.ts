@@ -160,6 +160,7 @@ export class RenderObject {
   }
 
   setup() {
+    this.program.use();
     const vao = this.vao ?? this.context.createVertexArray();
     invariant(!!vao, 'Error creating vertex array object');
     this.vao = vao;
@@ -170,11 +171,12 @@ export class RenderObject {
   }
 
   update() {
-    // invariant(!!this.vao, 'Error creating vertex array object');
+    this.program.use();
+
     this.context.bindVertexArray(this.vao);
     this.updateAttributes();
     this.updateUniforms();
-    // this.context.bindVertexArray(null);
+    this.context.bindVertexArray(null);
   }
 
   draw() {
@@ -186,5 +188,9 @@ export class RenderObject {
 
   remove() {
     this.program.delete();
+    this.context.deleteVertexArray(this.vao);
+    this.buffers.forEach((buffer) => {
+      this.context.deleteBuffer(buffer);
+    });
   }
 }
