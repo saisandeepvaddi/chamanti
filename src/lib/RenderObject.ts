@@ -8,8 +8,8 @@ export class RenderObject {
   uniforms: Uniform[] = [];
   program: Program;
   context: GLContext;
-
   buffers: Map<string, WebGLBuffer> = new Map();
+  vao: WebGLVertexArrayObject | null = null;
   constructor(
     context: GLContext,
     { name, vertexShader, fragmentShader, attributes, uniforms }: BufferObject
@@ -21,8 +21,10 @@ export class RenderObject {
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
 
-    this.setupBuffers = this.setupBuffers.bind(this);
-    this.updateBuffers = this.updateBuffers.bind(this);
+    this.setupAttributes = this.setupAttributes.bind(this);
+    this.setup = this.setup.bind(this);
+    this.update = this.update.bind(this);
+    this.updateAttributes = this.updateAttributes.bind(this);
     this.updateUniform = this.updateUniform.bind(this);
     this.updateAttribute = this.updateAttribute.bind(this);
     this.setAttribute = this.setAttribute.bind(this);
@@ -34,15 +36,6 @@ export class RenderObject {
   }
 
   private createBuffer(name: string) {
-    // if (State.webglVersion === 2) {
-    //   const vao =
-    //     this.vao ??
-    //     (this.context as WebGL2RenderingContext).createVertexArray();
-    //   invariant(!!vao, 'Error creating vertex array object');
-    //   this.vao = vao;
-    //   (this.context as WebGL2RenderingContext).bindVertexArray(vao);
-    // }
-
     const buffer = this.buffers.get(name) ?? this.context.createBuffer();
     invariant(!!buffer, 'Error binding buffers. WebGL createBuffer failed');
     this.buffers.set(name, buffer);
@@ -56,34 +49,8 @@ export class RenderObject {
     this.context.bufferData(
       this.context.ARRAY_BUFFER,
       data,
-      this.context.STATIC_DRAW
+      this.context.DYNAMIC_DRAW
     );
-  }
-
-  setupBuffers() {
-    this.attributes.forEach(
-      ({ name, size, type, normalized, stride, offset }) => {
-        this.createBuffer(name);
-        this.setAttribute(name, size, type, normalized, stride, offset);
-      }
-    );
-
-    this.uniforms.forEach(({ name, value }) => {
-      this.setUniform(name, value);
-    });
-  }
-
-  updateBuffers() {
-    this.attributes.forEach(
-      ({ name, data, size, normalized, offset, stride, type }) => {
-        this.updateBuffer(name, new Float32Array(data));
-        this.setAttribute(name, size, type, normalized, stride, offset);
-      }
-    );
-
-    this.uniforms.forEach(({ name, value }) => {
-      this.setUniform(name, value);
-    });
   }
 
   setAttribute(
@@ -111,6 +78,17 @@ export class RenderObject {
     );
     this.context.enableVertexAttribArray(location);
   }
+
+  setupAttributes() {
+    this.attributes.forEach(
+      ({ name, size, type, normalized, stride, offset, data }) => {
+        this.createBuffer(name);
+        this.updateBuffer(name, new Float32Array(data));
+        this.setAttribute(name, size, type, normalized, stride, offset);
+      }
+    );
+  }
+
   setUniform(
     uniform: string,
     value: number | boolean | number[] | Float32Array
@@ -150,6 +128,12 @@ export class RenderObject {
     }
   }
 
+  setupUniforms() {
+    this.uniforms.forEach(({ name, value }) => {
+      this.setUniform(name, value);
+    });
+  }
+
   updateAttribute(attributeName: string, data: number[]) {
     const attribute = this.attributes.find((a) => a.name === attributeName);
     invariant(!!attribute, `Attribute ${attributeName} not found`);
@@ -161,6 +145,36 @@ export class RenderObject {
     const uniform = this.uniforms.find((u) => u.name === uniformName);
     invariant(!!uniform, `Uniform ${uniformName} not found`);
     uniform.value = value;
+  }
+
+  updateAttributes() {
+    this.attributes.forEach(({ name, data }) => {
+      this.updateBuffer(name, new Float32Array(data));
+    });
+  }
+
+  updateUniforms() {
+    this.uniforms.forEach(({ name, value }) => {
+      this.setUniform(name, value);
+    });
+  }
+
+  setup() {
+    const vao = this.vao ?? this.context.createVertexArray();
+    invariant(!!vao, 'Error creating vertex array object');
+    this.vao = vao;
+    this.context.bindVertexArray(vao);
+    this.setupAttributes();
+    this.setupUniforms();
+    this.context.bindVertexArray(null);
+  }
+
+  update() {
+    // invariant(!!this.vao, 'Error creating vertex array object');
+    this.context.bindVertexArray(this.vao);
+    this.updateAttributes();
+    this.updateUniforms();
+    // this.context.bindVertexArray(null);
   }
 
   draw() {

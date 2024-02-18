@@ -25,16 +25,21 @@ export class Chamanti {
         State.webglVersion = 2;
       } else {
         console.error('WebGL2 not available, falling back to WebGL1');
-        context = canvas.getContext('webgl');
+        context = canvas.getContext('webgl') as GLContext | null;
         State.webglVersion = 1;
       }
     } else {
-      context = canvas.getContext('webgl');
+      context = canvas.getContext('webgl') as GLContext | null;
       State.webglVersion = 1;
     }
 
     invariant(!!context, 'No WebGL context available in your browser.');
-
+    const ext = context.getExtension('OES_vertex_array_object');
+    if (ext) {
+      context.createVertexArray = ext.createVertexArrayOES.bind(ext);
+      context.bindVertexArray = ext.bindVertexArrayOES.bind(ext);
+      context.deleteVertexArray = ext.deleteVertexArrayOES.bind(ext);
+    }
     this.renderer = options.renderer ?? new Renderer(context);
   }
 }

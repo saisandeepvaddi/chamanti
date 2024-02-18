@@ -31,7 +31,7 @@ export class Renderer {
     const renderObject = new RenderObject(this.context, object);
     this.renderObjects.set(renderObject.id, renderObject);
 
-    renderObject.setupBuffers();
+    renderObject.setup();
 
     return renderObject;
   }
@@ -44,7 +44,7 @@ export class Renderer {
 
     for (const renderObject of this.renderObjects.values()) {
       renderObject.program.use();
-      renderObject.updateBuffers();
+      renderObject.update();
       renderObject.draw();
     }
   }

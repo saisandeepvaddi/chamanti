@@ -1,4 +1,10 @@
-export type GLContext = WebGL2RenderingContext | WebGLRenderingContext;
+export type WebGL1WithVao = WebGLRenderingContext & {
+  createVertexArray: () => WebGLVertexArrayObject | null;
+  bindVertexArray: (vao: WebGLVertexArrayObject | null) => void;
+  deleteVertexArray: (vao: WebGLVertexArrayObject | null) => void;
+};
+
+export type GLContext = WebGL2RenderingContext | WebGL1WithVao;
 
 export type Attribute = {
   name: string;
