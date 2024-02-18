@@ -36,7 +36,36 @@ export class Renderer {
     return renderObject;
   }
 
+  resizeScreen() {
+    let displayWidth = 0;
+    let displayHeight = 0;
+
+    if (this.context.canvas instanceof HTMLCanvasElement) {
+      displayWidth = this.context.canvas.clientWidth;
+      displayHeight = this.context.canvas.clientHeight;
+    } else if (this.context.canvas instanceof OffscreenCanvas) {
+      displayWidth = this.context.canvas.width;
+      displayHeight = this.context.canvas.height;
+    }
+
+    if (
+      this.context.canvas.width !== displayWidth ||
+      this.context.canvas.height !== displayHeight
+    ) {
+      this.context.canvas.width = displayWidth;
+      this.context.canvas.height = displayHeight;
+    }
+
+    this.context.viewport(
+      0,
+      0,
+      this.context.canvas.width,
+      this.context.canvas.height
+    );
+  }
+
   render(_deltaTime: number = 0) {
+    this.resizeScreen();
     this.context.clearColor(0.0, 0.0, 0.0, 1.0);
     this.context.clear(
       this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT
