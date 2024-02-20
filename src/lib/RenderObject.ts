@@ -8,7 +8,7 @@ import {
   invariant,
 } from '.';
 import { Program } from './Program';
-import { Texture } from './TextureObject';
+import { Texture } from './Texture';
 export class RenderObject {
   id = uuid();
   name: string;

@@ -74,7 +74,7 @@ export class Texture {
   }
 
   update() {
-    invariant(!!this.texture, 'Texture not loaded');
+    invariant(!!this.texture, `Texture ${this.uniformName} not loaded`);
     if (this.textureUpdated) {
       this.context.activeTexture(this.context.TEXTURE0);
       this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
