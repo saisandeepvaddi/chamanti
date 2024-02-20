@@ -6,7 +6,7 @@ export class Program {
   private vertexShader: WebGLShader;
   private fragmentShader: WebGLShader;
   private attributes: Map<string, GLint> = new Map();
-  private uniforms: Map<string, WebGLUniformLocation> = new Map();
+  private uniforms: Map<string, WebGLUniformLocation | null> = new Map();
 
   constructor(
     context: GLContext,
@@ -84,7 +84,7 @@ export class Program {
     return location;
   }
 
-  getUniformLocation(uniform: string): WebGLUniformLocation {
+  getUniformLocation(uniform: string): WebGLUniformLocation | null {
     invariant(
       !!this.program,
       'Error setting uniforms. No program created... call createProgram with shaders.'
@@ -93,8 +93,6 @@ export class Program {
     const location =
       this.uniforms.get(uniform) ??
       this.context.getUniformLocation(this.program, uniform);
-
-    invariant(!!location, `No uniform found with name ${uniform}`);
 
     this.uniforms.set(uniform, location);
 

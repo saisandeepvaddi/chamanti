@@ -1,6 +1,14 @@
 import { v4 as uuid } from 'uuid';
-import { Attribute, BufferObject, GLContext, Uniform, invariant } from '.';
+import {
+  Attribute,
+  BufferObject,
+  GLContext,
+  TextureMap,
+  Uniform,
+  invariant,
+} from '.';
 import { Program } from './Program';
+import { Texture } from './TextureObject';
 export class RenderObject {
   id = uuid();
   name: string;
@@ -10,9 +18,18 @@ export class RenderObject {
   context: GLContext;
   buffers: Map<string, WebGLBuffer> = new Map();
   vao: WebGLVertexArrayObject | null = null;
+  textures: TextureMap[] = [];
+  textureMaps: Map<string, Texture | null> = new Map();
   constructor(
     context: GLContext,
-    { name, vertexShader, fragmentShader, attributes, uniforms }: BufferObject
+    {
+      name,
+      vertexShader,
+      fragmentShader,
+      attributes,
+      uniforms,
+      textures,
+    }: BufferObject
   ) {
     this.context = context;
     this.program = new Program(this.context, vertexShader, fragmentShader);
@@ -20,6 +37,7 @@ export class RenderObject {
     this.name = name;
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
+    this.textures = textures ?? [];
 
     this.setupAttributes = this.setupAttributes.bind(this);
     this.setup = this.setup.bind(this);
@@ -33,6 +51,10 @@ export class RenderObject {
     this.createBuffer = this.createBuffer.bind(this);
     this.remove = this.remove.bind(this);
     this.draw = this.draw.bind(this);
+    this.setupTexture = this.setupTexture.bind(this);
+    this.updateTexture = this.updateTexture.bind(this);
+    this.setupTextures = this.setupTextures.bind(this);
+    this.updateTextures = this.updateTextures.bind(this);
   }
 
   private createBuffer(name: string) {
@@ -97,8 +119,18 @@ export class RenderObject {
       !!this.program,
       'Error setting uniforms. No program created... call createProgram with shaders.'
     );
+
     const location = this.program.getUniformLocation(uniform);
-    invariant(!!location, `No uniform found with name ${uniform}`);
+
+    if (!location) {
+      // warn(
+      //   !!location,
+      //   `No uniform found with name '${uniform}'. Check if your shader uses '${uniform}' uniform`
+      // );
+
+      return null;
+    }
+
     switch (typeof value) {
       case 'number':
         this.context.uniform1f(location, value);
@@ -159,6 +191,42 @@ export class RenderObject {
     });
   }
 
+  setupTexture(url: string, uniformName: string = 'uTexture') {
+    const texture = new Texture(this.context);
+    texture.uniformName = uniformName;
+    const uniformLocation = this.program.getUniformLocation(uniformName);
+    invariant(!!uniformLocation, `No uniform found with name ${uniformName}`);
+    texture.load(url).then(() => {
+      texture.uniformLocation = uniformLocation;
+    });
+    this.textureMaps.set(uniformName, texture);
+  }
+
+  updateTexture(uniformName: string = 'uTexture') {
+    invariant(
+      !!this.textureMaps.get(uniformName),
+      `Texture: ${uniformName} not setup`
+    );
+    this.textureMaps.get(uniformName)?.update();
+  }
+
+  setupTextures() {
+    this.textures.forEach((texture) => {
+      console.log(texture);
+      if (texture) {
+        this.setupTexture(texture.url, texture.name);
+      }
+    });
+  }
+
+  updateTextures() {
+    this.textures.forEach((texture) => {
+      if (texture) {
+        this.updateTexture(texture.name);
+      }
+    });
+  }
+
   setup() {
     this.program.use();
 
@@ -169,6 +237,7 @@ export class RenderObject {
     this.context.bindVertexArray(vao);
     this.setupAttributes();
     this.setupUniforms();
+    this.setupTextures();
     this.context.bindVertexArray(null);
   }
 
@@ -177,6 +246,7 @@ export class RenderObject {
     this.context.bindVertexArray(this.vao);
     this.updateAttributes();
     this.updateUniforms();
+    this.updateTextures();
   }
 
   draw() {

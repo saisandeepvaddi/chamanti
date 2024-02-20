@@ -21,10 +21,16 @@ export type Uniform = {
   value: number | boolean | number[] | Float32Array;
 };
 
+export type TextureMap = {
+  name: string;
+  url: string;
+};
+
 export type BufferObject = {
   name: string;
   vertexShader: string;
   fragmentShader: string;
   attributes?: Attribute[];
   uniforms?: Uniform[];
+  textures?: TextureMap[];
 };

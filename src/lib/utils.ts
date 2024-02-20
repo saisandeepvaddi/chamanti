@@ -6,3 +6,15 @@ export function invariant(
     throw new Error(message);
   }
 }
+
+export function warn(condition: boolean, message = 'Warning') {
+  if (!condition) {
+    console.warn(message);
+  }
+}
+
+export function error(condition: boolean, message = 'Error') {
+  if (!condition) {
+    console.error(message);
+  }
+}

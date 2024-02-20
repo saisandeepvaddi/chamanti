@@ -48,20 +48,19 @@ export class Renderer {
       displayHeight = this.context.canvas.height;
     }
 
+    let shouldResize = false;
     if (
       this.context.canvas.width !== displayWidth ||
       this.context.canvas.height !== displayHeight
     ) {
       this.context.canvas.width = displayWidth;
       this.context.canvas.height = displayHeight;
+      shouldResize = true;
     }
 
-    this.context.viewport(
-      0,
-      0,
-      this.context.canvas.width,
-      this.context.canvas.height
-    );
+    if (shouldResize) {
+      this.context.viewport(0, 0, displayWidth, displayHeight);
+    }
   }
 
   render(_deltaTime: number = 0) {
