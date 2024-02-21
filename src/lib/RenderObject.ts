@@ -23,6 +23,7 @@ export class RenderObject {
   textures: TextureMap[] = [];
   textureMaps: Map<string, Texture | null> = new Map();
   modelMatrix: mat4;
+  wireframe: boolean = false;
   constructor(
     context: GLContext,
     {
@@ -269,7 +270,11 @@ export class RenderObject {
     this.update();
     if (this.attributes.length > 0) {
       const count = this.attributes[0].data.length / this.attributes[0].size;
-      this.context.drawArrays(this.context.TRIANGLES, 0, count);
+      this.context.drawArrays(
+        this.wireframe ? this.context.LINES : this.context.TRIANGLES,
+        0,
+        count
+      );
     }
   }
 

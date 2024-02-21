@@ -159,8 +159,10 @@ const obj = renderer.addBufferObject({
   fragmentShader: modelFragmentShader,
 });
 
+obj.wireframe = true;
+
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
-camera.setPosition(2, 2, 5);
+camera.setPosition(2, 3, 5);
 
 obj.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
