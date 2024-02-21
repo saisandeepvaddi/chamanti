@@ -1,3 +1,5 @@
+import { mat3, mat4 } from 'gl-matrix';
+
 export type WebGL1WithVao = WebGLRenderingContext & {
   createVertexArray: () => WebGLVertexArrayObject | null;
   bindVertexArray: (vao: WebGLVertexArrayObject | null) => void;
@@ -16,9 +18,17 @@ export type Attribute = {
   offset?: number;
 };
 
+export type UniformValue =
+  | number
+  | boolean
+  | number[]
+  | Float32Array
+  | mat3
+  | mat4;
+
 export type Uniform = {
   name: string;
-  value: number | boolean | number[] | Float32Array;
+  value: UniformValue;
 };
 
 export type TextureMap = {

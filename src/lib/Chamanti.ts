@@ -39,6 +39,7 @@ export class Chamanti {
       this.context.bindVertexArray = ext.bindVertexArrayOES.bind(ext);
       this.context.deleteVertexArray = ext.deleteVertexArrayOES.bind(ext);
     }
+    this.context.enable(this.context.DEPTH_TEST);
     this.renderer = options.renderer ?? new Renderer(this.context);
   }
 }

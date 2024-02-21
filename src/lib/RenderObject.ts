@@ -1,3 +1,4 @@
+import { mat4 } from 'gl-matrix';
 import { v4 as uuid } from 'uuid';
 import {
   Attribute,
@@ -5,6 +6,7 @@ import {
   GLContext,
   TextureMap,
   Uniform,
+  UniformValue,
   invariant,
 } from '.';
 import { Program } from './Program';
@@ -20,6 +22,7 @@ export class RenderObject {
   vao: WebGLVertexArrayObject | null = null;
   textures: TextureMap[] = [];
   textureMaps: Map<string, Texture | null> = new Map();
+  modelMatrix: mat4;
   constructor(
     context: GLContext,
     {
@@ -38,6 +41,7 @@ export class RenderObject {
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
     this.textures = textures ?? [];
+    this.modelMatrix = mat4.create();
 
     this.setupAttributes = this.setupAttributes.bind(this);
     this.setup = this.setup.bind(this);
@@ -55,6 +59,11 @@ export class RenderObject {
     this.updateTexture = this.updateTexture.bind(this);
     this.setupTextures = this.setupTextures.bind(this);
     this.updateTextures = this.updateTextures.bind(this);
+    this.setModelMatrix = this.setModelMatrix.bind(this);
+  }
+
+  setModelMatrix(modelMatrix: mat4) {
+    this.modelMatrix = modelMatrix;
   }
 
   private createBuffer(name: string) {
@@ -88,7 +97,11 @@ export class RenderObject {
       'Error setting attributes. No program created... call createProgram with shaders.'
     );
     const location = this.program.getAttributeLocation(attribute);
-    invariant(location !== -1, `No attribute found with name ${attribute}`);
+    if (location === -1) {
+      // console.warn(`No attribute found with name ${attribute}`);
+      return null;
+    }
+    // invariant(location !== -1, `No attribute found with name ${attribute}`);
 
     this.context.vertexAttribPointer(
       location,
@@ -111,10 +124,7 @@ export class RenderObject {
     );
   }
 
-  setUniform(
-    uniform: string,
-    value: number | boolean | number[] | Float32Array
-  ) {
+  setUniform(uniform: string, value: UniformValue) {
     invariant(
       !!this.program,
       'Error setting uniforms. No program created... call createProgram with shaders.'
@@ -153,6 +163,12 @@ export class RenderObject {
             case 4:
               this.context.uniform4fv(location, value);
               break;
+            case 9:
+              this.context.uniformMatrix3fv(location, false, value);
+              break;
+            case 16:
+              this.context.uniformMatrix4fv(location, false, value);
+              break;
             default:
               throw new Error('Invalid uniform value');
           }
@@ -173,7 +189,7 @@ export class RenderObject {
     attribute.data = data;
   }
 
-  updateUniform(uniformName: string, value: number) {
+  updateUniform(uniformName: string, value: UniformValue) {
     const uniform = this.uniforms.find((u) => u.name === uniformName);
     invariant(!!uniform, `Uniform ${uniformName} not found`);
     uniform.value = value;
