@@ -20,15 +20,21 @@ export class Chamanti {
   ) {
     if (options.webglVersion === 2) {
       if (canvas.getContext('webgl2')) {
-        this.context = canvas.getContext('webgl2');
+        this.context = canvas.getContext('webgl2', {
+          alpha: true,
+        }) as GLContext | null;
         State.webglVersion = 2;
       } else {
         console.error('WebGL2 not available, falling back to WebGL1');
-        this.context = canvas.getContext('webgl') as GLContext | null;
+        this.context = canvas.getContext('webgl', {
+          alpha: true,
+        }) as GLContext | null;
         State.webglVersion = 1;
       }
     } else {
-      this.context = canvas.getContext('webgl') as GLContext | null;
+      this.context = canvas.getContext('webgl', {
+        alpha: true,
+      }) as GLContext | null;
       State.webglVersion = 1;
     }
 
@@ -40,6 +46,8 @@ export class Chamanti {
       this.context.deleteVertexArray = ext.deleteVertexArrayOES.bind(ext);
     }
     this.context.enable(this.context.DEPTH_TEST);
+    this.context.cullFace(this.context.BACK);
+    this.context.depthFunc(this.context.LEQUAL);
     this.renderer = options.renderer ?? new Renderer(this.context);
   }
 }

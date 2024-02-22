@@ -155,7 +155,7 @@ const obj = renderer.addBufferObject({
   fragmentShader: modelFragmentShader,
 });
 
-obj.wireframe = true;
+obj.wireframe = false;
 
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
 camera.setPosition(2, 3, 5);
