@@ -11,6 +11,7 @@ export type GLContext = WebGL2RenderingContext | WebGL1WithVao;
 export type Attribute = {
   name: string;
   data: number[];
+  indices?: number[];
   size: number;
   type?: number;
   normalized?: boolean;

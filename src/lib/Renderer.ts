@@ -10,22 +10,8 @@ export class Renderer {
   constructor(context: GLContext) {
     this.context = context;
 
-    // this.startRenderLoop = this.startRenderLoop.bind(this);
     this.render = this.render.bind(this);
   }
-  // startRenderLoop() {
-  //   if (this.rafId) {
-  //     cancelAnimationFrame(this.rafId);
-  //   }
-  //   const animate = (time: number) => {
-  //     const deltaTime = time - this.prevFrameTime;
-  //     this.prevFrameTime = time;
-  //     this.elapsedTime += deltaTime;
-  //     this.render(deltaTime);
-  //     this.rafId = requestAnimationFrame(animate);
-  //   };
-  //   this.rafId = requestAnimationFrame(animate);
-  // }
 
   addBufferObject(object: BufferObject) {
     const renderObject = new RenderObject(this.context, object);

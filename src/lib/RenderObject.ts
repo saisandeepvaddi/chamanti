@@ -24,6 +24,8 @@ export class RenderObject {
   textureMaps: Map<string, Texture | null> = new Map();
   modelMatrix: mat4;
   wireframe: boolean = false;
+  indices: number[] = [];
+  indexBuffer: WebGLBuffer | null = null;
   constructor(
     context: GLContext,
     {
@@ -61,6 +63,7 @@ export class RenderObject {
     this.setupTextures = this.setupTextures.bind(this);
     this.updateTextures = this.updateTextures.bind(this);
     this.setModelMatrix = this.setModelMatrix.bind(this);
+    this.updateIndexBuffer = this.updateIndexBuffer.bind(this);
   }
 
   setModelMatrix(modelMatrix: mat4) {
@@ -81,7 +84,7 @@ export class RenderObject {
     this.context.bufferData(
       this.context.ARRAY_BUFFER,
       data,
-      this.context.DYNAMIC_DRAW
+      this.context.STATIC_DRAW
     );
   }
 
@@ -115,14 +118,31 @@ export class RenderObject {
     this.context.enableVertexAttribArray(location);
   }
 
-  setupAttributes() {
-    this.attributes.forEach(
-      ({ name, size, type, normalized, stride, offset, data }) => {
-        this.createBuffer(name);
-        this.updateBuffer(name, new Float32Array(data));
-        this.setAttribute(name, size, type, normalized, stride, offset);
-      }
+  updateIndexBuffer(name: string, data: number[]) {
+    const buffer = this.buffers.get(name);
+    invariant(!!buffer, `No buffer found with name ${name}`);
+    this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, buffer);
+    this.context.bufferData(
+      this.context.ELEMENT_ARRAY_BUFFER,
+      new Uint16Array(data),
+      this.context.STATIC_DRAW
     );
+  }
+
+  setupAttributes() {
+    this.attributes.forEach((attribute) => {
+      const { name, data, size, type, normalized, stride, offset } = attribute;
+
+      this.createBuffer(name);
+      this.updateBuffer(name, new Float32Array(data));
+      this.setAttribute(name, size, type, normalized, stride, offset);
+
+      if (attribute.indices) {
+        const name = attribute.name + '_index';
+        this.createBuffer(name);
+        this.updateIndexBuffer(name, attribute.indices);
+      }
+    });
   }
 
   setUniform(uniform: string, value: UniformValue) {
@@ -197,8 +217,12 @@ export class RenderObject {
   }
 
   updateAttributes() {
-    this.attributes.forEach(({ name, data }) => {
+    this.attributes.forEach(({ name, data, indices }) => {
       this.updateBuffer(name, new Float32Array(data));
+      if (indices) {
+        const indexBufferName = name + '_index';
+        this.updateIndexBuffer(indexBufferName, indices);
+      }
     });
   }
 
@@ -270,12 +294,23 @@ export class RenderObject {
     this.update();
     if (this.attributes.length > 0) {
       const count = this.attributes[0].data.length / this.attributes[0].size;
-      this.context.drawArrays(
-        this.wireframe ? this.context.LINES : this.context.TRIANGLES,
-        0,
-        count
-      );
+
+      if (this.buffers.has('aPosition_index')) {
+        this.context.drawElements(
+          this.wireframe ? this.context.LINES : this.context.TRIANGLES,
+          this.attributes[0].indices?.length ?? 0,
+          this.context.UNSIGNED_SHORT,
+          0
+        );
+      } else {
+        this.context.drawArrays(
+          this.wireframe ? this.context.LINES : this.context.TRIANGLES,
+          0,
+          count
+        );
+      }
     }
+    this.context.flush();
   }
 
   remove() {
