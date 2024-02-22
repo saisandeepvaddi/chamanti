@@ -253,7 +253,6 @@ export class RenderObject {
 
   setupTextures() {
     this.textures.forEach((texture) => {
-      console.log(texture);
       if (texture) {
         this.setupTexture(texture.url, texture.name);
       }

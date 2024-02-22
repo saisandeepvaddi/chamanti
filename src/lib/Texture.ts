@@ -43,28 +43,31 @@ export class Texture {
         this.context.UNSIGNED_BYTE,
         image
       );
-
       if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
         this.context.generateMipmap(this.context.TEXTURE_2D);
+        this.context.texParameteri(
+          this.context.TEXTURE_2D,
+          this.context.TEXTURE_MIN_FILTER,
+          this.context.LINEAR_MIPMAP_LINEAR
+        );
       } else {
         this.context.texParameteri(
           this.context.TEXTURE_2D,
           this.context.TEXTURE_WRAP_S,
           this.context.CLAMP_TO_EDGE
         );
-
         this.context.texParameteri(
           this.context.TEXTURE_2D,
           this.context.TEXTURE_WRAP_T,
           this.context.CLAMP_TO_EDGE
         );
-
         this.context.texParameteri(
           this.context.TEXTURE_2D,
           this.context.TEXTURE_MIN_FILTER,
           this.context.LINEAR
         );
       }
+
       this.isLoaded = true;
       this.textureUpdated = true;
     };

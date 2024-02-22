@@ -5,7 +5,8 @@ import modelFragmentShader from './lib/shaders/modelFragment.glsl';
 import modelVetexShader from './lib/shaders/modelVertex.glsl';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 const chamanti = new Chamanti(canvas);
 
 const renderer = chamanti.renderer;
@@ -128,10 +129,31 @@ const solidFaceIndices = [
   4, 0, 3, 4, 3, 7,
 ];
 
+const textureCoords = [
+  // Front face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+  // Back face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+  // Top face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+  // Bottom face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+  // Right face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+  // Left face
+  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+];
+
 const obj = renderer.addBufferObject({
   name: 'cube',
   attributes: [
     { name: 'aPosition', size: 3, data: vertexData, indices: solidFaceIndices },
+    { name: 'aTexCoord', size: 2, data: textureCoords },
   ],
   uniforms: [
     {
@@ -153,6 +175,12 @@ const obj = renderer.addBufferObject({
   ],
   vertexShader: modelVetexShader,
   fragmentShader: modelFragmentShader,
+  textures: [
+    {
+      name: 'uTexture',
+      url: '/debug_texture.jpg',
+    },
+  ],
 });
 
 obj.wireframe = false;
@@ -164,7 +192,10 @@ obj.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 camera.lookAt([0, 0, 0], [0, 1, 0]);
 
+const modelMatrix = mat4.create();
 function animate() {
+  const angle = (performance.now() / 1000) * Math.PI * 0.5;
+  obj.updateUniform('uModelMatrix', mat4.fromYRotation(modelMatrix, angle));
   renderer.render();
   requestAnimationFrame(animate);
 }
