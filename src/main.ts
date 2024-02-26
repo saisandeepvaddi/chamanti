@@ -1,6 +1,7 @@
 import { mat4 } from 'gl-matrix';
 import Chamanti from './lib';
-import { Camera } from './lib/Camera';
+import { Camera } from './lib/camera/Camera';
+import { CameraControls } from './lib/camera/camera-controls';
 import modelFragmentShader from './lib/shaders/modelFragment.glsl';
 import modelVetexShader from './lib/shaders/modelVertex.glsl';
 
@@ -40,80 +41,6 @@ const vertexData = [
   -0.5, // Vertex 7
 ];
 
-// const wireframeIndices = [
-//   // Front face
-//   0,
-//   1,
-//   1,
-//   2,
-//   2,
-//   3,
-//   3,
-//   0, // Outer edges
-//   0,
-//   2, // Diagonal
-
-//   // Back face
-//   4,
-//   5,
-//   5,
-//   6,
-//   6,
-//   7,
-//   7,
-//   4, // Outer edges
-//   5,
-//   7, // Diagonal
-
-//   // Top face
-//   3,
-//   2,
-//   2,
-//   6,
-//   6,
-//   7,
-//   7,
-//   3, // Outer edges
-//   2,
-//   7, // Diagonal
-
-//   // Bottom face
-//   0,
-//   1,
-//   1,
-//   5,
-//   5,
-//   4,
-//   4,
-//   0, // Outer edges
-//   1,
-//   4, // Diagonal
-
-//   // Right face
-//   1,
-//   2,
-//   2,
-//   6,
-//   6,
-//   5,
-//   5,
-//   1, // Outer edges
-//   2,
-//   5, // Diagonal
-
-//   // Left face
-//   0,
-//   3,
-//   3,
-//   7,
-//   7,
-//   4,
-//   4,
-//   0, // Outer edges
-//   3,
-//   4, // Diagonal
-// ];
-
 const solidFaceIndices = [
   // Front face
   0, 1, 2, 0, 2, 3,
@@ -131,22 +58,23 @@ const solidFaceIndices = [
 
 const textureCoords = [
   // Front face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-
+  0.0,
+  0.0, // Vertex 0
+  1.0,
+  0.0, // Vertex 1
+  1.0,
+  1.0, // Vertex 2
+  0.0,
+  1.0, // Vertex 3
   // Back face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-
-  // Top face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-
-  // Bottom face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-
-  // Right face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-
-  // Left face
-  0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+  0.0,
+  0.0, // Vertex 4
+  1.0,
+  0.0, // Vertex 5
+  1.0,
+  1.0, // Vertex 6
+  0.0,
+  1.0, // Vertex 7
 ];
 
 const obj = renderer.addBufferObject({
@@ -188,14 +116,22 @@ obj.wireframe = false;
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
 camera.setPosition(2, 3, 5);
 
+const { updateCameraPosition } = new CameraControls(camera, canvas);
+
 obj.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 camera.lookAt([0, 0, 0], [0, 1, 0]);
 
 const modelMatrix = mat4.create();
+
 function animate() {
   const angle = (performance.now() / 1000) * Math.PI * 0.5;
   obj.updateUniform('uModelMatrix', mat4.fromYRotation(modelMatrix, angle));
+  obj.updateUniform('uViewMatrix', camera.getViewMatrix());
+  obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
+
+  updateCameraPosition();
+
   renderer.render();
   requestAnimationFrame(animate);
 }
