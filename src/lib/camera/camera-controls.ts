@@ -17,6 +17,7 @@ export class CameraControls {
   center: vec3 = [0, 0, 0];
   constructor(camera: Camera, canvas: HTMLCanvasElement) {
     this.camera = camera;
+    this.spherical.radius = vec3.distance(this.camera.position, this.center);
     this.canvas = canvas;
 
     this.dragGesture = new DragGesture(canvas, ({ delta }) => {
@@ -49,11 +50,12 @@ export class CameraControls {
 
   updateCameraPosition() {
     const { theta, phi, radius } = this.spherical;
-    const x = radius * Math.sin(phi) * Math.cos(theta);
+
+    const x = radius * Math.sin(phi) * Math.sin(theta);
     const y = radius * Math.cos(phi);
-    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const z = radius * Math.sin(phi) * Math.cos(theta);
 
     this.camera.setPosition(x, y, z);
-    this.camera.lookAt(this.center, [0, 1, 0]);
+    this.camera.lookAt(this.center);
   }
 }

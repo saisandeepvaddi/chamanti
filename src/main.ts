@@ -148,7 +148,7 @@ renderer.addObject(obj2);
 obj2.updateAttribute('aPosition', vertexData2);
 
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
-camera.setPosition(2, 3, 5);
+camera.setPosition(0, 0, 5);
 
 const { updateCameraPosition } = new CameraControls(camera, canvas);
 
@@ -157,13 +157,12 @@ obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 obj2.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj2.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 
-camera.lookAt([0, 0, 0], [0, 1, 0]);
+camera.lookAt([0, 0, 0]);
 
 function animate() {
   const angle = (performance.now() / 1000) * Math.PI * 0.5;
-  // obj.setRotation('y', angle);
-  const newScale = Math.sin(angle) * 0.5 + 1;
-  obj.setScale(newScale, 1, 1);
+  obj.setRotation([1, 1, 1], angle);
+
   obj.updateUniform('uViewMatrix', camera.getViewMatrix());
   obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 

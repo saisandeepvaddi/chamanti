@@ -4,6 +4,7 @@ export class Camera {
   projectionMatrix: mat4;
   viewMatrix: mat4;
   position: vec3 = [0, 0, 0];
+  up: vec3 = [0, 1, 0];
   constructor(fov: number, aspect: number, near: number, far: number) {
     this.projectionMatrix = mat4.create();
     this.viewMatrix = mat4.create();
@@ -16,8 +17,8 @@ export class Camera {
     this.getProjectionMatrix = this.getProjectionMatrix.bind(this);
   }
 
-  lookAt(target: vec3, up: vec3) {
-    mat4.lookAt(this.viewMatrix, this.position, target, up);
+  lookAt(target: vec3) {
+    mat4.lookAt(this.viewMatrix, this.position, target, this.up);
   }
 
   setPosition(x: number, y: number, z: number) {
