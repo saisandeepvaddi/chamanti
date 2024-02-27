@@ -26,6 +26,7 @@ export class RenderObject {
   wireframe: boolean = false;
   indices: number[] = [];
   indexBuffer: WebGLBuffer | null = null;
+  hidden: boolean = false;
   constructor(
     context: GLContext,
     {
@@ -64,6 +65,10 @@ export class RenderObject {
     this.updateTextures = this.updateTextures.bind(this);
     this.setModelMatrix = this.setModelMatrix.bind(this);
     this.updateIndexBuffer = this.updateIndexBuffer.bind(this);
+    this.setupUniforms = this.setupUniforms.bind(this);
+    this.updateUniforms = this.updateUniforms.bind(this);
+
+    this.hide = this.hide.bind(this);
   }
 
   setModelMatrix(modelMatrix: mat4) {
@@ -310,6 +315,10 @@ export class RenderObject {
       }
     }
     this.context.flush();
+  }
+
+  hide() {
+    this.hidden = true;
   }
 
   remove() {

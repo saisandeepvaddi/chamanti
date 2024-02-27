@@ -57,6 +57,7 @@ export class Renderer {
     );
 
     for (const renderObject of this.renderObjects.values()) {
+      if (renderObject.hidden) continue;
       renderObject.draw();
     }
   }
