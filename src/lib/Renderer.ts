@@ -13,11 +13,17 @@ export class Renderer {
     this.render = this.render.bind(this);
   }
 
-  addBufferObject(object: BufferObject) {
+  addObject(object: BufferObject): RenderObject;
+  addObject(object: RenderObject): RenderObject;
+  addObject(object: BufferObject | RenderObject): RenderObject {
+    if (object instanceof RenderObject) {
+      this.renderObjects.set(object.id, object);
+      object.setup();
+      return object;
+    }
+
     const renderObject = new RenderObject(this.context, object);
-
     renderObject.setup();
-
     this.renderObjects.set(renderObject.id, renderObject);
     return renderObject;
   }

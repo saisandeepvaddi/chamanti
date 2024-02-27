@@ -27,6 +27,8 @@ export class RenderObject {
   indices: number[] = [];
   indexBuffer: WebGLBuffer | null = null;
   hidden: boolean = false;
+  vertexShaderSource: string;
+  fragmentShaderSource: string;
   constructor(
     context: GLContext,
     {
@@ -39,6 +41,8 @@ export class RenderObject {
     }: BufferObject
   ) {
     this.context = context;
+    this.vertexShaderSource = vertexShader;
+    this.fragmentShaderSource = fragmentShader;
     this.program = new Program(this.context, vertexShader, fragmentShader);
     invariant(!!this.program, 'WebGL createProgram failed');
     this.name = name;
@@ -69,6 +73,7 @@ export class RenderObject {
     this.updateUniforms = this.updateUniforms.bind(this);
 
     this.hide = this.hide.bind(this);
+    this.clone = this.clone.bind(this);
   }
 
   setModelMatrix(modelMatrix: mat4) {
@@ -327,5 +332,17 @@ export class RenderObject {
     this.buffers.forEach((buffer) => {
       this.context.deleteBuffer(buffer);
     });
+  }
+
+  clone() {
+    const cloned = new RenderObject(this.context, {
+      name: this.name + uuid(),
+      vertexShader: this.vertexShaderSource,
+      fragmentShader: this.fragmentShaderSource,
+      attributes: this.attributes.map((a) => ({ ...a })),
+      uniforms: this.uniforms.map((u) => ({ ...u })),
+      textures: this.textures.map((t) => ({ ...t })),
+    });
+    return cloned;
   }
 }
