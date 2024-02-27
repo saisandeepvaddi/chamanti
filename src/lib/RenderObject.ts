@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import { v4 as uuid } from 'uuid';
 import {
   Attribute,
@@ -11,6 +11,13 @@ import {
 } from '.';
 import { Program } from './Program';
 import { Texture } from './Texture';
+
+type Transform = {
+  position: vec3;
+  rotation: { axis: vec3; angle: number };
+  scale: vec3;
+};
+
 export class RenderObject {
   id = uuid();
   name: string;
@@ -22,13 +29,14 @@ export class RenderObject {
   vao: WebGLVertexArrayObject | null = null;
   textures: TextureMap[] = [];
   textureMaps: Map<string, Texture | null> = new Map();
-  modelMatrix: mat4;
   wireframe: boolean = false;
   indices: number[] = [];
   indexBuffer: WebGLBuffer | null = null;
   hidden: boolean = false;
   vertexShaderSource: string;
   fragmentShaderSource: string;
+  transform: Transform;
+  modelMatrix: mat4 = mat4.create();
   constructor(
     context: GLContext,
     {
@@ -49,7 +57,12 @@ export class RenderObject {
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
     this.textures = textures ?? [];
-    this.modelMatrix = mat4.create();
+
+    this.transform = {
+      position: vec3.create(),
+      rotation: { axis: vec3.create(), angle: 0 },
+      scale: vec3.fromValues(1, 1, 1),
+    };
 
     this.setupAttributes = this.setupAttributes.bind(this);
     this.setup = this.setup.bind(this);
@@ -67,17 +80,58 @@ export class RenderObject {
     this.updateTexture = this.updateTexture.bind(this);
     this.setupTextures = this.setupTextures.bind(this);
     this.updateTextures = this.updateTextures.bind(this);
-    this.setModelMatrix = this.setModelMatrix.bind(this);
     this.updateIndexBuffer = this.updateIndexBuffer.bind(this);
     this.setupUniforms = this.setupUniforms.bind(this);
     this.updateUniforms = this.updateUniforms.bind(this);
+    this.updateModelMatrix = this.updateModelMatrix.bind(this);
+    this.setPosition = this.setPosition.bind(this);
+    this.setRotation = this.setRotation.bind(this);
+    this.setScale = this.setScale.bind(this);
 
     this.hide = this.hide.bind(this);
     this.clone = this.clone.bind(this);
   }
 
-  setModelMatrix(modelMatrix: mat4) {
-    this.modelMatrix = modelMatrix;
+  setPosition(x: number, y: number, z: number) {
+    this.transform.position = vec3.fromValues(x, y, z);
+    this.updateModelMatrix();
+  }
+
+  setRotation(axis: 'x' | 'y' | 'z', angle: number): void;
+  setRotation(axis: vec3, angle: number): void;
+  setRotation(axis: vec3 | 'x' | 'y' | 'z', angle: number) {
+    let axisVec: vec3;
+    if (axis === 'x') {
+      axisVec = vec3.fromValues(1, 0, 0);
+    } else if (axis === 'y') {
+      axisVec = vec3.fromValues(0, 1, 0);
+    } else if (axis === 'z') {
+      axisVec = vec3.fromValues(0, 0, 1);
+    } else {
+      axisVec = axis;
+    }
+    this.transform.rotation = { axis: axisVec, angle };
+    this.updateModelMatrix();
+  }
+
+  setScale(x: number, y: number, z: number) {
+    this.transform.scale = vec3.fromValues(x, y, z);
+    this.updateModelMatrix();
+  }
+
+  updateModelMatrix() {
+    const { position, rotation, scale } = this.transform;
+    mat4.identity(this.modelMatrix);
+    mat4.translate(this.modelMatrix, this.modelMatrix, position);
+    mat4.rotate(
+      this.modelMatrix,
+      this.modelMatrix,
+      rotation.angle,
+      rotation.axis
+    );
+    mat4.scale(this.modelMatrix, this.modelMatrix, scale);
+
+    this.updateUniform('uModelMatrix', this.modelMatrix);
   }
 
   private createBuffer(name: string) {

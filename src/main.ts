@@ -159,11 +159,11 @@ obj2.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 
 camera.lookAt([0, 0, 0], [0, 1, 0]);
 
-const modelMatrix = mat4.create();
-
 function animate() {
   const angle = (performance.now() / 1000) * Math.PI * 0.5;
-  obj.updateUniform('uModelMatrix', mat4.fromYRotation(modelMatrix, angle));
+  // obj.setRotation('y', angle);
+  const newScale = Math.sin(angle) * 0.5 + 1;
+  obj.setScale(newScale, 1, 1);
   obj.updateUniform('uViewMatrix', camera.getViewMatrix());
   obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 
