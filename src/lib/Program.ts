@@ -2,11 +2,11 @@ import { GLContext, invariant } from '.';
 
 export class Program {
   context: GLContext;
-  private program: WebGLProgram;
-  private vertexShader: WebGLShader;
-  private fragmentShader: WebGLShader;
-  private attributes: Map<string, GLint> = new Map();
-  private uniforms: Map<string, WebGLUniformLocation | null> = new Map();
+  program: WebGLProgram;
+  vertexShader: WebGLShader;
+  fragmentShader: WebGLShader;
+  attributes: Map<string, GLint> = new Map();
+  uniforms: Map<string, WebGLUniformLocation | null> = new Map();
 
   constructor(
     context: GLContext,

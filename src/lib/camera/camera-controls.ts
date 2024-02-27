@@ -1,4 +1,5 @@
 import { DragGesture, WheelGesture } from '@use-gesture/vanilla';
+import { vec3 } from 'gl-matrix';
 import { Camera } from './Camera';
 
 export class CameraControls {
@@ -13,7 +14,7 @@ export class CameraControls {
   wheelGesture: WheelGesture;
   sensitivity = 0.005;
   autoUpdateCamera = false;
-
+  center: vec3 = [0, 0, 0];
   constructor(camera: Camera, canvas: HTMLCanvasElement) {
     this.camera = camera;
     this.canvas = canvas;
@@ -38,8 +39,12 @@ export class CameraControls {
     });
 
     this.updateCameraPosition = this.updateCameraPosition.bind(this);
-
+    this.setCenter = this.setCenter.bind(this);
     this.updateCameraPosition();
+  }
+
+  setCenter(center: vec3) {
+    this.center = center;
   }
 
   updateCameraPosition() {
@@ -49,6 +54,6 @@ export class CameraControls {
     const z = radius * Math.sin(phi) * Math.sin(theta);
 
     this.camera.setPosition(x, y, z);
-    this.camera.lookAt([0, 0, 0], [0, 1, 0]);
+    this.camera.lookAt(this.center, [0, 1, 0]);
   }
 }
