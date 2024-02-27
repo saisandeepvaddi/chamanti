@@ -41,6 +41,37 @@ const vertexData = [
   -0.5, // Vertex 7
 ];
 
+const translation = [-1.5, 1.5, 0]; // Translation vector
+
+const vertexData2 = [
+  // Front face
+  -0.75 + translation[0],
+  -0.75 + translation[1],
+  0.75 + translation[2], // Vertex 0
+  0.75 + translation[0],
+  -0.75 + translation[1],
+  0.75 + translation[2], // Vertex 1
+  0.75 + translation[0],
+  0.75 + translation[1],
+  0.75 + translation[2], // Vertex 2
+  -0.75 + translation[0],
+  0.75 + translation[1],
+  0.75 + translation[2], // Vertex 3
+  // Back face
+  -0.75 + translation[0],
+  -0.75 + translation[1],
+  -0.75 + translation[2], // Vertex 4
+  0.75 + translation[0],
+  -0.75 + translation[1],
+  -0.75 + translation[2], // Vertex 5
+  0.75 + translation[0],
+  0.75 + translation[1],
+  -0.75 + translation[2], // Vertex 6
+  -0.75 + translation[0],
+  0.75 + translation[1],
+  -0.75 + translation[2], // Vertex 7
+];
+
 const solidFaceIndices = [
   // Front face
   0, 1, 2, 0, 2, 3,
@@ -59,22 +90,22 @@ const solidFaceIndices = [
 const textureCoords = [
   // Front face
   0.0,
-  0.0, // Vertex 0
+  1.0, // Vertex 0
   1.0,
-  0.0, // Vertex 1
+  1.0, // Vertex 1
   1.0,
-  1.0, // Vertex 2
+  0.0, // Vertex 2
   0.0,
-  1.0, // Vertex 3
+  0.0, // Vertex 3
   // Back face
   0.0,
-  0.0, // Vertex 4
+  1.0, // Vertex 4
   1.0,
-  0.0, // Vertex 5
+  1.0, // Vertex 5
   1.0,
-  1.0, // Vertex 6
+  0.0, // Vertex 6
   0.0,
-  1.0, // Vertex 7
+  0.0, // Vertex 7
 ];
 
 const obj = renderer.addBufferObject({
@@ -111,7 +142,48 @@ const obj = renderer.addBufferObject({
   ],
 });
 
-obj.wireframe = false;
+const obj2 = renderer.addBufferObject({
+  name: 'cube2',
+  attributes: [
+    {
+      name: 'aPosition',
+      size: 3,
+      data: vertexData2,
+      indices: solidFaceIndices,
+    },
+    { name: 'aTexCoord', size: 2, data: textureCoords },
+  ],
+  uniforms: [
+    {
+      name: 'uTime',
+      value: 0,
+    },
+    {
+      name: 'uViewMatrix',
+      value: mat4.create(),
+    },
+    {
+      name: 'uProjectionMatrix',
+      value: mat4.create(),
+    },
+    {
+      name: 'uModelMatrix',
+      value: mat4.create(),
+    },
+  ],
+  vertexShader: modelVetexShader,
+  fragmentShader: modelFragmentShader,
+  textures: [
+    {
+      name: 'uTexture',
+      url: '/debug_texture.jpg',
+    },
+  ],
+});
+
+// const obj2 = deepCopy(obj);
+// obj2.name = 'cube2';
+// obj2.updateAttribute('aPosition', vertexData2);
 
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
 camera.setPosition(2, 3, 5);
@@ -120,15 +192,24 @@ const { updateCameraPosition } = new CameraControls(camera, canvas);
 
 obj.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
+obj2.updateUniform('uViewMatrix', camera.getViewMatrix());
+obj2.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 camera.lookAt([0, 0, 0], [0, 1, 0]);
 
 const modelMatrix = mat4.create();
+const modelMatrix2 = mat4.create();
+
+// obj.hide();
+// obj2.hide();
 
 function animate() {
   const angle = (performance.now() / 1000) * Math.PI * 0.5;
   obj.updateUniform('uModelMatrix', mat4.fromYRotation(modelMatrix, angle));
   obj.updateUniform('uViewMatrix', camera.getViewMatrix());
   obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
+  // obj2.updateUniform('uModelMatrix', mat4.fromYRotation(modelMatrix2, angle));
+  // obj2.updateUniform('uViewMatrix', camera.getViewMatrix());
+  // obj2.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 
   updateCameraPosition();
 
