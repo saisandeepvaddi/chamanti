@@ -1,6 +1,5 @@
-import { GLContext } from '.';
+import { Config, GLContext } from '.';
 import { Renderer } from './Renderer';
-import { State } from './config';
 import { invariant } from './utils';
 
 export type ChamantiOptions = {
@@ -10,7 +9,7 @@ export type ChamantiOptions = {
 
 export class Chamanti {
   renderer: Renderer;
-  context: GLContext | null = null;
+  context: GLContext;
   constructor(
     canvas: HTMLCanvasElement,
     options: ChamantiOptions = {
@@ -22,20 +21,20 @@ export class Chamanti {
       if (canvas.getContext('webgl2')) {
         this.context = canvas.getContext('webgl2', {
           alpha: true,
-        }) as GLContext | null;
-        State.webglVersion = 2;
+        }) as GLContext;
+        Config.webglVersion = 2;
       } else {
         console.error('WebGL2 not available, falling back to WebGL1');
         this.context = canvas.getContext('webgl', {
           alpha: true,
-        }) as GLContext | null;
-        State.webglVersion = 1;
+        }) as GLContext;
+        Config.webglVersion = 1;
       }
     } else {
       this.context = canvas.getContext('webgl', {
         alpha: true,
-      }) as GLContext | null;
-      State.webglVersion = 1;
+      }) as GLContext;
+      Config.webglVersion = 1;
     }
 
     invariant(!!this.context, 'No WebGL context available in your browser.');

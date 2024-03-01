@@ -1,4 +1,4 @@
-import { BufferObject, GLContext } from './';
+import { BufferObject, GLContext, getConfig } from './';
 import { RenderObject } from './RenderObject';
 
 export class Renderer {
@@ -57,7 +57,8 @@ export class Renderer {
 
   render(_deltaTime: number = 0) {
     this.resizeScreen();
-    this.context.clearColor(0.0, 0.0, 0.0, 1.0);
+    const [r, g, b, a] = getConfig().clearColor;
+    this.context.clearColor(r, g, b, a);
     this.context.clear(
       this.context.COLOR_BUFFER_BIT | this.context.DEPTH_BUFFER_BIT
     );

@@ -3,6 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "src/lib/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/lib/index.ts",
+      "require": "./src/lib/index.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

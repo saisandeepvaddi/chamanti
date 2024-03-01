@@ -30,8 +30,8 @@ export class RenderObject {
   textures: TextureMap[] = [];
   textureMaps: Map<string, Texture | null> = new Map();
   wireframe: boolean = false;
-  indices: number[] = [];
   indexBuffer: WebGLBuffer | null = null;
+  useIndices: boolean = false;
   hidden: boolean = false;
   vertexShaderSource: string;
   fragmentShaderSource: string;
@@ -202,6 +202,7 @@ export class RenderObject {
       this.setAttribute(name, size, type, normalized, stride, offset);
 
       if (attribute.indices) {
+        this.useIndices = true;
         const name = attribute.name + '_index';
         this.createBuffer(name);
         this.updateIndexBuffer(name, attribute.indices);
@@ -358,7 +359,7 @@ export class RenderObject {
     if (this.attributes.length > 0) {
       const count = this.attributes[0].data.length / this.attributes[0].size;
 
-      if (this.buffers.has('aPosition_index')) {
+      if (this.useIndices) {
         this.context.drawElements(
           this.wireframe ? this.context.LINES : this.context.TRIANGLES,
           this.attributes[0].indices?.length ?? 0,
