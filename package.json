@@ -3,11 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "src/lib/index.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/chamanti.umd.cjs",
+  "module": "./dist/chamanti.js",
   "exports": {
     ".": {
-      "import": "./src/lib/index.ts",
-      "require": "./src/lib/index.js"
+      "import": "./dist/chamanti.js",
+      "require": "./dist/chamanti.umd.cjs"
     }
   },
   "scripts": {
@@ -26,6 +30,7 @@
     "prettier": "^3.2.5",
     "typescript": "^5.2.2",
     "vite": "^5.1.0",
+    "vite-plugin-dts": "^3.7.3",
     "vite-plugin-glsl": "^1.2.1"
   },
   "dependencies": {
