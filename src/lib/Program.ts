@@ -20,10 +20,6 @@ export class Program {
       this.context.FRAGMENT_SHADER
     );
     this.program = this.create();
-    this.use = this.use.bind(this);
-    this.getAttributeLocation = this.getAttributeLocation.bind(this);
-    this.getUniformLocation = this.getUniformLocation.bind(this);
-    this.delete = this.delete.bind(this);
   }
 
   private shader(source: string, type: number) {

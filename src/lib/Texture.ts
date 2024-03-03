@@ -14,8 +14,6 @@ export class Texture {
     const texture = this.context.createTexture();
     invariant(!!texture, 'WebGL createTexture failed');
     this.texture = texture;
-    this.load = this.load.bind(this);
-    this.update = this.update.bind(this);
   }
   async load(url: string) {
     this.context.bindTexture(this.context.TEXTURE_2D, this.texture);

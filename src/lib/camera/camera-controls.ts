@@ -39,8 +39,6 @@ export class CameraControls {
       }
     });
 
-    this.updateCameraPosition = this.updateCameraPosition.bind(this);
-    this.setCenter = this.setCenter.bind(this);
     this.updateCameraPosition();
   }
 

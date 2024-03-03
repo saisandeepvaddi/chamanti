@@ -10,11 +10,6 @@ export class Camera {
     this.viewMatrix = mat4.create();
 
     mat4.perspective(this.projectionMatrix, fov, aspect, near, far);
-
-    this.lookAt = this.lookAt.bind(this);
-    this.setPosition = this.setPosition.bind(this);
-    this.getViewMatrix = this.getViewMatrix.bind(this);
-    this.getProjectionMatrix = this.getProjectionMatrix.bind(this);
   }
 
   lookAt(target: vec3) {

@@ -9,8 +9,6 @@ export class Renderer {
   context: GLContext;
   constructor(context: GLContext) {
     this.context = context;
-
-    this.render = this.render.bind(this);
   }
 
   addObject(object: BufferObject): RenderObject;

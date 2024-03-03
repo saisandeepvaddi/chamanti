@@ -63,33 +63,6 @@ export class RenderObject {
       rotation: { axis: vec3.create(), angle: 0 },
       scale: vec3.fromValues(1, 1, 1),
     };
-
-    this.setupAttributes = this.setupAttributes.bind(this);
-    this.setup = this.setup.bind(this);
-    this.update = this.update.bind(this);
-    this.updateAttributes = this.updateAttributes.bind(this);
-    this.updateUniform = this.updateUniform.bind(this);
-    this.updateAttribute = this.updateAttribute.bind(this);
-    this.setAttribute = this.setAttribute.bind(this);
-    this.setUniform = this.setUniform.bind(this);
-    this.updateBuffer = this.updateBuffer.bind(this);
-    this.createBuffer = this.createBuffer.bind(this);
-    this.remove = this.remove.bind(this);
-    this.draw = this.draw.bind(this);
-    this.setupTexture = this.setupTexture.bind(this);
-    this.updateTexture = this.updateTexture.bind(this);
-    this.setupTextures = this.setupTextures.bind(this);
-    this.updateTextures = this.updateTextures.bind(this);
-    this.updateIndexBuffer = this.updateIndexBuffer.bind(this);
-    this.setupUniforms = this.setupUniforms.bind(this);
-    this.updateUniforms = this.updateUniforms.bind(this);
-    this.updateModelMatrix = this.updateModelMatrix.bind(this);
-    this.setPosition = this.setPosition.bind(this);
-    this.setRotation = this.setRotation.bind(this);
-    this.setScale = this.setScale.bind(this);
-
-    this.hide = this.hide.bind(this);
-    this.clone = this.clone.bind(this);
   }
 
   setPosition(x: number, y: number, z: number) {
