@@ -150,7 +150,7 @@ obj2.updateAttribute('aPosition', vertexData2);
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 100.0);
 camera.setPosition(0, 0, 5);
 
-const { updateCameraPosition } = new CameraControls(camera, canvas);
+const controls = new CameraControls(camera, canvas);
 
 obj.updateUniform('uViewMatrix', camera.getViewMatrix());
 obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
@@ -166,7 +166,7 @@ function animate() {
   obj.updateUniform('uViewMatrix', camera.getViewMatrix());
   obj.updateUniform('uProjectionMatrix', camera.getProjectionMatrix());
 
-  updateCameraPosition();
+  controls.updateCameraPosition();
 
   renderer.render();
   requestAnimationFrame(animate);

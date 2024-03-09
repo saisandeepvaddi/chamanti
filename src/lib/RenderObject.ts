@@ -67,7 +67,7 @@ export class RenderObject {
 
   setPosition(x: number, y: number, z: number) {
     this.transform.position = vec3.fromValues(x, y, z);
-    this.updateModelMatrix();
+    this.updateTransform();
   }
 
   setRotation(axis: 'x' | 'y' | 'z', angle: number): void;
@@ -84,15 +84,15 @@ export class RenderObject {
       axisVec = axis;
     }
     this.transform.rotation = { axis: axisVec, angle };
-    this.updateModelMatrix();
+    this.updateTransform();
   }
 
   setScale(x: number, y: number, z: number) {
     this.transform.scale = vec3.fromValues(x, y, z);
-    this.updateModelMatrix();
+    this.updateTransform();
   }
 
-  updateModelMatrix() {
+  updateTransform() {
     const { position, rotation, scale } = this.transform;
     mat4.identity(this.modelMatrix);
     mat4.translate(this.modelMatrix, this.modelMatrix, position);
