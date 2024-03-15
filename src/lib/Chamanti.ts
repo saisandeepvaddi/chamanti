@@ -1,4 +1,4 @@
-import { Config, GLContext } from '.';
+import { GLContext, Global } from '.';
 import { Renderer } from './Renderer';
 import { invariant } from './utils';
 
@@ -22,22 +22,23 @@ export class Chamanti {
         this.context = canvas.getContext('webgl2', {
           alpha: true,
         }) as GLContext;
-        Config.webglVersion = 2;
+        Global.webglVersion = 2;
       } else {
         console.error('WebGL2 not available, falling back to WebGL1');
         this.context = canvas.getContext('webgl', {
           alpha: true,
         }) as GLContext;
-        Config.webglVersion = 1;
+        Global.webglVersion = 1;
       }
     } else {
       this.context = canvas.getContext('webgl', {
         alpha: true,
       }) as GLContext;
-      Config.webglVersion = 1;
+      Global.webglVersion = 1;
     }
 
     invariant(!!this.context, 'No WebGL context available in your browser.');
+    Global._glContext = this.context;
     const ext = this.context.getExtension('OES_vertex_array_object');
     if (ext) {
       this.context.createVertexArray = ext.createVertexArrayOES.bind(ext);
