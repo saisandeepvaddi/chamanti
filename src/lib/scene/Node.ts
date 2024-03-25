@@ -12,20 +12,13 @@ export class Node {
   constructor(name: string) {
     this.name = name;
   }
-  setMesh(mesh: Mesh) {
-    this.mesh = mesh;
-  }
 
-  setMaterial(material: Material) {
-    this.material = material;
-  }
-
-  addChild(child: Node) {
+  add(child: Node) {
     child.parent = this;
     this.children.push(child);
   }
 
-  removeChild(child: Node) {
+  remove(child: Node) {
     const index = this.children.indexOf(child);
     if (index !== -1) {
       this.children.splice(index, 1);

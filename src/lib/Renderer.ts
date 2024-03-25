@@ -1,15 +1,16 @@
-import { BufferObject, GLContext, getConfig } from './';
+import { BufferObject, Camera, getConfig } from './';
 import { RenderObject } from './RenderObject';
+import { getGLContext } from './context';
+import { Scene } from './scene/Scene';
 
 export class Renderer {
   elapsedTime: number = 0;
   prevFrameTime: number = 0;
   renderObjects: Map<string, RenderObject> = new Map();
   rafId: number | null = null;
-  context: GLContext;
-  constructor(context: GLContext) {
-    this.context = context;
-  }
+  scene: Scene | null = null;
+  camera: Camera | null = null;
+  context = getGLContext();
 
   addObject(object: BufferObject): RenderObject;
   addObject(object: RenderObject): RenderObject;
@@ -51,6 +52,14 @@ export class Renderer {
     if (shouldResize) {
       this.context.viewport(0, 0, displayWidth, displayHeight);
     }
+  }
+
+  setScene(scene: Scene) {
+    this.scene = scene;
+  }
+
+  setCamera(camera: Camera) {
+    this.camera = camera;
   }
 
   render(_deltaTime: number = 0) {

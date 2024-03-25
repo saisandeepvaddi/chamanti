@@ -1,5 +1,6 @@
 import { GLContext, Global } from '.';
 import { Renderer } from './Renderer';
+import { setGLContext } from './context';
 import { invariant } from './utils';
 
 export type ChamantiOptions = {
@@ -48,6 +49,7 @@ export class Chamanti {
     this.context.enable(this.context.DEPTH_TEST);
     this.context.cullFace(this.context.BACK);
     this.context.depthFunc(this.context.LEQUAL);
-    this.renderer = options.renderer ?? new Renderer(this.context);
+    this.renderer = options.renderer ?? new Renderer();
+    setGLContext(this.context);
   }
 }
