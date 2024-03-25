@@ -4,9 +4,9 @@ export class Transform {
   position: vec3 = vec3.create();
   localPosition: vec3 = vec3.create();
   rotation: vec3 = vec3.create();
-  quaternion: quat = quat.create();
+  quaternion: quat = quat.fromEuler(quat.create(), 0, 0, 0);
   localRotation: vec3 = vec3.create();
-  scale: vec3 = vec3.create();
+  scale: vec3 = vec3.fromValues(1, 1, 1);
   localScale: vec3 = vec3.create();
   localMatrix: mat4 = mat4.create();
   worldMatrix: mat4 = mat4.create();
@@ -19,11 +19,17 @@ export class Transform {
     this.position[0] = x;
     this.position[1] = y;
     this.position[2] = z;
-    mat4.fromTranslation(this.localMatrix, this.position);
+
+    mat4.multiply(
+      this.localMatrix,
+      mat4.fromTranslation(mat4.create(), this.position),
+      this.localMatrix
+    );
+
     this.updateWorldMatrix();
     return this;
   }
-  updatePosition({
+  updatePositionBy({
     x = 0,
     y = 0,
     z = 0,
@@ -31,7 +37,7 @@ export class Transform {
     this.position[0] += x;
     this.position[1] += y;
     this.position[2] += z;
-    mat4.fromTranslation(this.localMatrix, this.position);
+    mat4.translate(this.localMatrix, this.localMatrix, this.position);
     this.updateWorldMatrix();
     return this;
   }
@@ -50,12 +56,18 @@ export class Transform {
       this.rotation[1],
       this.rotation[2]
     );
-    mat4.fromQuat(this.localMatrix, this.quaternion);
+
+    mat4.multiply(
+      this.localMatrix,
+      mat4.fromQuat(mat4.create(), this.quaternion),
+      this.localMatrix
+    );
+
     this.updateWorldMatrix();
     return this;
   }
 
-  updateRotation({
+  updateRotationBy({
     x = 0,
     y = 0,
     z = 0,
@@ -69,7 +81,14 @@ export class Transform {
       this.rotation[1],
       this.rotation[2]
     );
-    mat4.fromQuat(this.localMatrix, this.quaternion);
+
+    // update matrix with latest rotation
+    mat4.multiply(
+      this.localMatrix,
+      mat4.fromQuat(mat4.create(), this.quaternion),
+      this.localMatrix
+    );
+
     this.updateWorldMatrix();
     return this;
   }
@@ -82,12 +101,18 @@ export class Transform {
     this.scale[0] = x;
     this.scale[1] = y;
     this.scale[2] = z;
-    mat4.fromScaling(this.localMatrix, this.scale);
+
+    mat4.multiply(
+      this.localMatrix,
+      mat4.fromScaling(mat4.create(), this.scale),
+      this.localMatrix
+    );
+
     this.updateWorldMatrix();
     return this;
   }
 
-  updateScale({
+  updateScaleBy({
     x = 1,
     y = 1,
     z = 1,
@@ -95,7 +120,7 @@ export class Transform {
     this.scale[0] += x;
     this.scale[1] += y;
     this.scale[2] += z;
-    mat4.fromScaling(this.localMatrix, this.scale);
+    mat4.scale(this.localMatrix, this.localMatrix, this.scale);
     this.updateWorldMatrix();
     return this;
   }
@@ -140,7 +165,7 @@ export class Transform {
   }
 
   // Update all three position, rotation, and scale at once
-  update({
+  updateBy({
     position = { x: 0, y: 0, z: 0 },
     rotation = { x: 0, y: 0, z: 0 },
     scale = { x: 1, y: 1, z: 1 },
@@ -156,6 +181,13 @@ export class Transform {
     this.rotation[0] += rotation.x ?? 0;
     this.rotation[1] += rotation.y ?? 0;
     this.rotation[2] += rotation.z ?? 0;
+
+    quat.fromEuler(
+      this.quaternion,
+      this.rotation[0],
+      this.rotation[1],
+      this.rotation[2]
+    );
 
     this.scale[0] += scale.x ?? 0;
     this.scale[1] += scale.y ?? 0;
