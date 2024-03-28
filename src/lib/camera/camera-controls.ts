@@ -22,7 +22,7 @@ export class CameraControls {
 
     this.dragGesture = new DragGesture(canvas, ({ delta }) => {
       const [dx, dy] = delta;
-      this.spherical.theta += dx * this.sensitivity;
+      this.spherical.theta -= dx * this.sensitivity;
       const newPhi = this.spherical.phi - dy * this.sensitivity;
       this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, newPhi));
 

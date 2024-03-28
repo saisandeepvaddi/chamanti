@@ -1,6 +1,6 @@
 import { Camera, CameraControls } from './lib';
 import { Mesh } from './lib/meshes/Mesh';
-import { Quad } from './lib/primitives/Quad';
+import { Cube } from './lib/primitives/Cube';
 import { WebGL2Renderer } from './lib/renderers/WebGL2Renderer';
 import { Node } from './lib/scene/Node';
 import { Scene } from './lib/scene/Scene';
@@ -13,10 +13,15 @@ const renderer = new WebGL2Renderer(canvas);
 
 const scene = new Scene();
 
-const node = new Node('Quad');
-const quad: Mesh = new Quad();
-node.addComponent(quad);
-scene.addNode(node);
+// const node = new Node('Quad');
+// const quad: Mesh = new Quad();
+// node.addComponent(quad);
+// scene.addNode(node);
+
+const node2 = new Node('Cube');
+const cube: Mesh = new Cube();
+node2.addComponent(cube);
+scene.addNode(node2);
 
 renderer.setScene(scene);
 
