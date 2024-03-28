@@ -1,5 +1,7 @@
 import Chamanti from './lib';
-import { Cube } from './lib/primitives/cube';
+import { Mesh } from './lib/meshes/Mesh';
+import { Quad } from './lib/primitives/Quad';
+import { Node } from './lib/scene/Node';
 import { Scene } from './lib/scene/Scene';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -11,4 +13,12 @@ const renderer = chamanti.renderer;
 
 const scene = new Scene();
 
-const cube = new Cube();
+const node = new Node('cube');
+const quad: Mesh = new Quad();
+node.addComponent(quad);
+
+scene.addNode(node);
+
+renderer.setScene(scene);
+
+renderer.render();

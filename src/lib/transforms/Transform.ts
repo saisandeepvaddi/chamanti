@@ -1,4 +1,5 @@
 import { mat4, quat, vec3 } from 'gl-matrix';
+import { Component } from '../scene/Component';
 
 export class Transform {
   position: vec3 = vec3.create();
@@ -11,6 +12,18 @@ export class Transform {
   localMatrix: mat4 = mat4.create();
   worldMatrix: mat4 = mat4.create();
   parent: Transform | null = null;
+  private observers: Component[] = [];
+
+  addObserver(observer: Component): void {
+    this.observers.push(observer);
+  }
+
+  notifyObservers(): void {
+    for (const observer of this.observers) {
+      observer.onTransformChanged(this);
+    }
+  }
+
   setPosition({
     x = 0,
     y = 0,
@@ -27,6 +40,7 @@ export class Transform {
     );
 
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
   updatePositionBy({
@@ -39,6 +53,7 @@ export class Transform {
     this.position[2] += z;
     mat4.translate(this.localMatrix, this.localMatrix, this.position);
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
 
@@ -64,6 +79,7 @@ export class Transform {
     );
 
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
 
@@ -90,6 +106,7 @@ export class Transform {
     );
 
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
 
@@ -109,6 +126,7 @@ export class Transform {
     );
 
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
 
@@ -122,6 +140,7 @@ export class Transform {
     this.scale[2] += z;
     mat4.scale(this.localMatrix, this.localMatrix, this.scale);
     this.updateWorldMatrix();
+    this.notifyObservers();
     return this;
   }
 
@@ -160,6 +179,7 @@ export class Transform {
       this.position,
       this.scale
     );
+    this.notifyObservers();
 
     return this;
   }
@@ -199,6 +219,7 @@ export class Transform {
       this.position,
       this.scale
     );
+    this.notifyObservers();
 
     return this;
   }

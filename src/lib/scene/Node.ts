@@ -1,6 +1,7 @@
-import { mat4 } from 'gl-matrix';
 import { Material } from '../materials/Material';
 import { Mesh } from '../meshes/Mesh';
+import { Transform } from '../transforms/Transform';
+import { Component } from './Component';
 
 export class Node {
   name: string;
@@ -8,25 +9,28 @@ export class Node {
   parent: Node | null = null;
   mesh: Mesh | null = null;
   material: Material | null = null;
-  transform: mat4 = mat4.create();
+  transform: Transform = new Transform();
+  components: Map<string, Component> = new Map();
   constructor(name: string) {
     this.name = name;
   }
 
-  add(child: Node) {
+  addChild(child: Node) {
     child.parent = this;
     this.children.push(child);
   }
 
-  remove(child: Node) {
+  removeChild(child: Node) {
     const index = this.children.indexOf(child);
     if (index !== -1) {
       this.children.splice(index, 1);
     }
   }
-  setTransform(transform: mat4) {
+  setTransform(transform: Transform) {
     this.transform = transform;
   }
 
-  render() {}
+  addComponent(component: Component) {
+    this.components.set(component.name, component);
+  }
 }

@@ -1,9 +1,9 @@
-import { BufferObject, Camera, getConfig } from './';
+import { BufferObject, Camera, getConfig } from '.';
 import { RenderObject } from './RenderObject';
 import { getGLContext } from './context';
 import { Scene } from './scene/Scene';
 
-export class Renderer {
+export class OldRenderer {
   elapsedTime: number = 0;
   prevFrameTime: number = 0;
   renderObjects: Map<string, RenderObject> = new Map();
