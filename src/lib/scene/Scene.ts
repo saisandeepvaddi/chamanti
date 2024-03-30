@@ -9,7 +9,7 @@ export class Scene {
     this.root = new Node('Root');
   }
 
-  addNode(node: Node) {
+  add(node: Node) {
     this.children.push(node);
   }
 }

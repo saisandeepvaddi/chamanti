@@ -1,3 +1,5 @@
+import { Material } from '../materials/Material';
+import Geometry from '../meshes/Geometry';
 import { Mesh } from '../meshes/Mesh';
 
 const QUAD_VERTICES = [-1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0];
@@ -7,6 +9,13 @@ const QUAD_TEXTURE_COORDS = [0, 1, 0, 0, 1, 0, 1, 1];
 
 export class Quad extends Mesh {
   constructor() {
-    super(QUAD_VERTICES, QUAD_INDICES, QUAD_NORMALS, QUAD_TEXTURE_COORDS);
+    const geometry = new Geometry(
+      QUAD_VERTICES,
+      QUAD_INDICES,
+      QUAD_NORMALS,
+      QUAD_TEXTURE_COORDS
+    );
+    const material = new Material();
+    super(geometry, material);
   }
 }

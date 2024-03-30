@@ -1,3 +1,5 @@
+import { Material } from '../materials/Material';
+import Geometry from '../meshes/Geometry';
 import { Mesh } from '../meshes/Mesh';
 
 const vertexData = [
@@ -31,7 +33,7 @@ const vertexData = [
 
 const translation = [-1.5, 1.5, 0]; // Translation vector
 
-const vertexData2 = [
+const _vertexData2 = [
   // Front face
   -0.75 + translation[0],
   -0.75 + translation[1],
@@ -98,6 +100,8 @@ const textureCoords = [
 
 export class Cube extends Mesh {
   constructor() {
-    super(vertexData, solidFaceIndices, undefined, textureCoords);
+    const geometry = new Geometry(vertexData, solidFaceIndices, textureCoords);
+    const material = new Material();
+    super(geometry, material);
   }
 }

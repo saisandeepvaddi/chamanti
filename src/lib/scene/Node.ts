@@ -1,27 +1,23 @@
 import { Camera } from '..';
-import { Material } from '../materials/Material';
 import { Mesh } from '../meshes/Mesh';
-import { Transform } from '../transforms/Transform';
+import { Transform, Transformable } from '../transforms/Transform';
 import { Component } from './Component';
 
-export class Node {
+export class Node implements Transformable {
   name: string;
   children: Node[] = [];
   parent: Node | null = null;
   mesh: Mesh | null = null;
-  material: Material | null = null;
-  transform: Transform = new Transform();
+  transform: Transform;
   components: Map<string, Component> = new Map();
   camera: Camera | null = null;
+  tickCallback: ((deltaTime: number) => void) | null = null;
   constructor(name: string, mesh: Mesh | null = null) {
     this.name = name;
     if (mesh) {
       this.addComponent(mesh);
     }
-  }
-  setCamera(camera: Camera) {
-    this.camera = camera;
-    this.material?.setCamera(camera);
+    this.transform = new Transform(this);
   }
 
   onTransformChanged(transform: Transform) {
@@ -49,40 +45,24 @@ export class Node {
   addComponent(component: Component) {
     if (component instanceof Mesh) {
       this.mesh = component;
-      if (!this.material) {
-        this.material = new Material();
-        this.material.setMesh(component);
-      }
-    }
-
-    if (component instanceof Material) {
-      this.material = component;
-      if (this.mesh) {
-        this.material.setMesh(this.mesh);
-      }
-    }
-
-    if (component instanceof Camera) {
-      this.camera = component;
-      if (this.material) {
-        this.material.setCamera(component);
-      }
     }
 
     this.components.set(component.name, component);
   }
 
   isRenderable() {
-    // return this.mesh !== null && this.material !== null;
-    return this.mesh !== null && this.material !== null;
+    return this.mesh !== null;
   }
-  render(camera: Camera) {
+  render(delta: number) {
     if (this.isRenderable()) {
-      this.material?.setCamera(camera);
-      this.material?.render();
+      this.mesh?.render(delta);
     }
     for (const child of this.children) {
-      child.render(camera);
+      child.render(delta);
     }
+    this.tickCallback?.(delta);
+  }
+  set tick(callback: (deltaTime: number) => void) {
+    this.tickCallback = callback;
   }
 }

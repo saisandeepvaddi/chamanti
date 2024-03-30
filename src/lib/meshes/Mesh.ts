@@ -1,29 +1,38 @@
+import { Material } from '../materials/Material';
 import { Component } from '../scene/Component';
 import { Transform } from '../transforms/Transform';
+import Geometry from './Geometry';
+import { MeshRenderer } from './MeshRenderer';
 
 export class Mesh extends Component {
-  vertices: number[];
-  indices: number[];
-  normals?: number[];
+  geometry: Geometry;
+  material: Material;
+  transform: Transform;
   textureCoords?: number[];
   name: string = 'Mesh';
-  constructor(
-    vertices: number[] = [],
-    indices: number[] = [],
-    normals?: number[],
-    textureCoords?: number[]
-  ) {
+  isRenderable = true;
+  meshRenderer: MeshRenderer;
+  constructor(geometry: Geometry, material: Material) {
     super();
-    this.vertices = vertices;
-    this.indices = indices;
-    this.normals = normals;
-    this.textureCoords = textureCoords;
+    this.transform = new Transform();
+    this.geometry = geometry;
+    this.material = material;
+    this.meshRenderer = new MeshRenderer(
+      this.geometry,
+      this.material,
+      this.transform
+    );
   }
   setName(name: string) {
     this.name = name;
   }
 
   onTransformChanged(transform: Transform): void {
-    console.log('Mesh.onTransformChanged not implemented.');
+    this.transform = transform;
+    this.meshRenderer.onTransformChanged(transform);
+  }
+
+  render(delta: number) {
+    this.meshRenderer.render(delta);
   }
 }

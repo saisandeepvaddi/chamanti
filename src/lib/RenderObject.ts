@@ -287,14 +287,13 @@ export class RenderObject {
 
   update() {
     this.program.use();
-    this.gl.bindVertexArray(this.vao);
     this.updateAttributes();
     this.updateUniforms();
     this.updateTextures();
-    this.gl.bindVertexArray(null);
   }
 
   draw() {
+    this.gl.bindVertexArray(this.vao);
     this.update();
     if (this.attributes.length > 0) {
       const count = this.attributes[0].data.length / this.attributes[0].size;
@@ -314,6 +313,7 @@ export class RenderObject {
         );
       }
     }
+    this.gl.bindVertexArray(null);
     this.gl.flush();
   }
 

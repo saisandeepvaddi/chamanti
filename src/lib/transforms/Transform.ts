@@ -1,6 +1,8 @@
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { Component } from '../scene/Component';
 
+export interface Transformable {
+  onTransformChanged(transform: Transform): void;
+}
 export class Transform {
   position: vec3 = vec3.create();
   localPosition: vec3 = vec3.create();
@@ -12,9 +14,16 @@ export class Transform {
   localMatrix: mat4 = mat4.create();
   worldMatrix: mat4 = mat4.create();
   parent: Transform | null = null;
-  private observers: Component[] = [];
+  private observers: Transformable[] = [];
 
-  addObserver(observer: Component): void {
+  constructor(observer?: Transformable) {
+    this.updateWorldMatrix();
+    if (observer) {
+      this.addObserver(observer);
+    }
+  }
+
+  addObserver(observer: Transformable): void {
     this.observers.push(observer);
   }
 

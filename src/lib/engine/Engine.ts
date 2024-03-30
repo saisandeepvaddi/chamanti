@@ -1,15 +1,15 @@
 import { CameraControls } from '..';
-import { WebGL2Renderer } from '../renderers/WebGL2Renderer';
+import { Renderer } from '../renderers/Renderer';
 import { GlobalState, _initGlobalState, getGlobalState } from '../state/global';
 
 export class Engine {
-  renderer: WebGL2Renderer;
+  renderer: Renderer;
   isRunning: boolean = false;
   state: GlobalState;
   controls: CameraControls | null = null;
   constructor(canvas: HTMLCanvasElement) {
     _initGlobalState(canvas);
-    this.renderer = new WebGL2Renderer();
+    this.renderer = new Renderer();
     this.state = getGlobalState();
     this.controls = new CameraControls(this.state.camera, this.state.canvas);
     this.startRenderLoop = this.startRenderLoop.bind(this);
@@ -17,6 +17,11 @@ export class Engine {
   start() {
     this.isRunning = true;
     this.startRenderLoop();
+  }
+
+  renderOnce() {
+    this.controls?.updateCameraPosition();
+    this.renderer.render();
   }
 
   startRenderLoop() {
