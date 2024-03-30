@@ -13,8 +13,11 @@ export class Node {
   transform: Transform = new Transform();
   components: Map<string, Component> = new Map();
   camera: Camera | null = null;
-  constructor(name: string) {
+  constructor(name: string, mesh: Mesh | null = null) {
     this.name = name;
+    if (mesh) {
+      this.addComponent(mesh);
+    }
   }
   setCamera(camera: Camera) {
     this.camera = camera;

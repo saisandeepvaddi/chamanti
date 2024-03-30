@@ -4,7 +4,7 @@ import { Mesh } from '../meshes/Mesh';
 import { Component } from '../scene/Component';
 import modelFragmentShader from '../shaders/modelFragment.glsl';
 import modelVetexShader from '../shaders/modelVertex.glsl';
-import { GlobalState } from '../state/global';
+import { getGlobalState } from '../state/global';
 import { Transform } from '../transforms/Transform';
 export class Material extends Component {
   name: string;
@@ -16,7 +16,7 @@ export class Material extends Component {
     super();
     this.name = name;
     this.transform = new Transform();
-    this.camera = GlobalState.camera;
+    this.camera = getGlobalState().camera;
     const uniforms: Uniform[] = [
       {
         name: 'uViewMatrix',
@@ -68,7 +68,6 @@ export class Material extends Component {
     this._renderObject.onTransformChanged(transform);
   }
   render() {
-    console.log('rendering...');
     if (this.mesh === null) {
       return;
     }

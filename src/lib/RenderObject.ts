@@ -9,7 +9,7 @@ import {
 } from '.';
 import { Program } from './Program';
 import { Texture } from './Texture';
-import { GlobalState } from './state/global';
+import { getGlobalState } from './state/global';
 import { Transform } from './transforms/Transform';
 
 export class RenderObject {
@@ -41,7 +41,7 @@ export class RenderObject {
     }: BufferObject,
     transform: Transform
   ) {
-    this.gl = GlobalState.getGLContext();
+    this.gl = getGlobalState().gl;
     this.vertexShaderSource = vertexShader;
     this.fragmentShaderSource = fragmentShader;
     this.program = new Program(this.gl, vertexShader, fragmentShader);
