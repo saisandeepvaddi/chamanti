@@ -31,38 +31,7 @@ const vertexData = [
   -0.5, // Vertex 7
 ];
 
-const translation = [-1.5, 1.5, 0]; // Translation vector
-
-const _vertexData2 = [
-  // Front face
-  -0.75 + translation[0],
-  -0.75 + translation[1],
-  0.75 + translation[2], // Vertex 0
-  0.75 + translation[0],
-  -0.75 + translation[1],
-  0.75 + translation[2], // Vertex 1
-  0.75 + translation[0],
-  0.75 + translation[1],
-  0.75 + translation[2], // Vertex 2
-  -0.75 + translation[0],
-  0.75 + translation[1],
-  0.75 + translation[2], // Vertex 3
-  // Back face
-  -0.75 + translation[0],
-  -0.75 + translation[1],
-  -0.75 + translation[2], // Vertex 4
-  0.75 + translation[0],
-  -0.75 + translation[1],
-  -0.75 + translation[2], // Vertex 5
-  0.75 + translation[0],
-  0.75 + translation[1],
-  -0.75 + translation[2], // Vertex 6
-  -0.75 + translation[0],
-  0.75 + translation[1],
-  -0.75 + translation[2], // Vertex 7
-];
-
-const solidFaceIndices = [
+const indexData = [
   // Front face
   0, 1, 2, 0, 2, 3,
   // Back face
@@ -99,9 +68,19 @@ const textureCoords = [
 ];
 
 export class Cube extends Mesh {
-  constructor() {
-    const geometry = new Geometry(vertexData, solidFaceIndices, textureCoords);
+  constructor(height: number = 1, width: number = 1, depth: number = 1) {
+    const scaledVertexData = vertexData.map((vertex, index) => {
+      if (index % 3 === 0) {
+        return vertex * width;
+      } else if (index % 3 === 1) {
+        return vertex * height;
+      } else {
+        return vertex * depth;
+      }
+    });
+    const geometry = new Geometry(scaledVertexData, indexData, textureCoords);
     const material = new Material();
+
     super(geometry, material);
   }
 }

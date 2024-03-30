@@ -11,7 +11,7 @@ export class Node implements Transformable {
   transform: Transform;
   components: Map<string, Component> = new Map();
   camera: Camera | null = null;
-  tickCallback: ((deltaTime: number) => void) | null = null;
+  tickCallback: ((self: Node, deltaTime: number) => void) | null = null;
   constructor(name: string, mesh: Mesh | null = null) {
     this.name = name;
     if (mesh) {
@@ -60,9 +60,9 @@ export class Node implements Transformable {
     for (const child of this.children) {
       child.render(delta);
     }
-    this.tickCallback?.(delta);
+    this.tickCallback?.(this, delta);
   }
-  set tick(callback: (deltaTime: number) => void) {
+  set tick(callback: (self: Node, deltaTime: number) => void) {
     this.tickCallback = callback;
   }
 }

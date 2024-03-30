@@ -64,7 +64,7 @@ export class MeshRenderer implements Transformable {
     this.transform = transform;
     this._renderObject.onTransformChanged(transform);
   }
-  render(delta: number) {
+  render(_delta: number) {
     this._renderObject.updateUniform(
       'uViewMatrix',
       this.camera.getViewMatrix()
