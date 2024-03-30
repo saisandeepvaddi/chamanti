@@ -12,7 +12,16 @@ engine.start();
 const cube = new Cube();
 const activeScene = engine.getActiveScene();
 const cubeNode = new Node('Cube', cube);
-// cubeNode.tick = (deltaTime: number) => {
-//   cubeNode.transform.updateRotationBy({ x: 0.01, y: 0.01, z: 0.01 });
-// };
+const times = 0;
+cubeNode.tick = (deltaTime: number) => {
+  // cubeNode.transform.updateRotationBy({
+  //   y: 0.1 * deltaTime,
+  // });
+  // cubeNode.transform.updatePositionBy({
+  //   x: 0.001 * deltaTime,
+  // });
+  // cubeNode.transform.updateScaleBy({
+  //   x: 0.001,
+  // });
+};
 activeScene.add(cubeNode);

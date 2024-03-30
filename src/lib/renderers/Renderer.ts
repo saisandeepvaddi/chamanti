@@ -6,7 +6,6 @@ export class Renderer {
   scene: Scene | null = null;
   camera: Camera | null = null;
   gl: WebGL2RenderingContext;
-  lastFrameTime: number = performance.now();
   constructor() {
     console.log('WebGL2Renderer created.');
     const globalState = getGlobalState();
@@ -46,10 +45,7 @@ export class Renderer {
     this.camera = camera;
   }
 
-  render(): void {
-    const currentTime = performance.now();
-    const deltaTime = (currentTime - this.lastFrameTime) / 1000;
-    this.lastFrameTime = currentTime;
+  render(delta: number): void {
     this.resizeScreen();
     const [r, g, b, a] = [0.0, 0.0, 0.0, 1.0];
     this.gl.clearColor(r, g, b, a);
@@ -57,7 +53,7 @@ export class Renderer {
     invariant(!!this.scene, 'No scene set.');
     invariant(!!this.camera, 'No camera set.');
     for (const child of this.scene.children) {
-      child.render(deltaTime);
+      child.render(delta);
     }
   }
 }

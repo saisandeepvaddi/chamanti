@@ -7,6 +7,7 @@ export class Engine {
   isRunning: boolean = false;
   state: GlobalState;
   controls: CameraControls | null = null;
+  lastFrameTime: number = performance.now();
   constructor(canvas: HTMLCanvasElement) {
     _initGlobalState(canvas);
     this.renderer = new Renderer();
@@ -16,17 +17,19 @@ export class Engine {
   }
   start() {
     this.isRunning = true;
-    this.startRenderLoop();
+    requestAnimationFrame(this.startRenderLoop);
   }
 
   renderOnce() {
     this.controls?.updateCameraPosition();
-    this.renderer.render();
+    this.renderer.render(this.lastFrameTime);
   }
 
-  startRenderLoop() {
+  startRenderLoop(time: number) {
     this.controls?.updateCameraPosition();
-    this.renderer.render();
+    const delta = time - this.lastFrameTime;
+    this.lastFrameTime = time;
+    this.renderer.render(delta);
     requestAnimationFrame(this.startRenderLoop);
   }
 

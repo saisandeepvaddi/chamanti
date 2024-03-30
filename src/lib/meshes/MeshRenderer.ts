@@ -39,7 +39,6 @@ export class MeshRenderer implements Transformable {
         value: mat4.create(),
       },
     ];
-    console.log(attributes);
     this._renderObject = new RenderObject(
       {
         name: 'MeshRenderer',
@@ -63,7 +62,7 @@ export class MeshRenderer implements Transformable {
   }
   onTransformChanged(transform: Transform): void {
     this.transform = transform;
-    // this._renderObject.onTransformChanged(transform);
+    this._renderObject.onTransformChanged(transform);
   }
   render(delta: number) {
     this._renderObject.updateUniform(
