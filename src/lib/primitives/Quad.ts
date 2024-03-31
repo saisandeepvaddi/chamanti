@@ -30,8 +30,8 @@ export class Quad extends Mesh {
     const geometry = new Geometry(
       scaledVertexData,
       QUAD_INDICES,
-      QUAD_NORMALS,
-      QUAD_TEXTURE_COORDS
+      QUAD_TEXTURE_COORDS,
+      QUAD_NORMALS
     );
     const material = new Material();
     super(geometry, material);

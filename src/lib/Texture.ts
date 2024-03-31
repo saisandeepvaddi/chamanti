@@ -43,7 +43,7 @@ export class Texture {
 
       image.onload = () => {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-        // this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, 1);
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.gl.texImage2D(
           this.gl.TEXTURE_2D,
           0,
