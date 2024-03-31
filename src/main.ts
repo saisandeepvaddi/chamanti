@@ -12,7 +12,7 @@ engine.start();
 
 // const cube = new Cube();
 const activeScene = engine.getActiveScene();
-const cubeNode = new Node('Cube', new Quad(1, 1));
+const quadNode = new Node('Quad', new Quad(1, 1));
 // const times = 0;
 // cubeNode.transform.setScale({
 //   x: 3,
@@ -30,9 +30,9 @@ const cubeNode = new Node('Cube', new Quad(1, 1));
 //   //   x: 0.001,
 //   // });
 // };
-activeScene.add(cubeNode);
-const tex = new Texture('uTexture', 'debug_texture.jpg');
-cubeNode.getMaterial().updateTexture(tex);
+activeScene.add(quadNode);
+const tex = new Texture('uTexture', 'debug_texture_2.jpg');
+quadNode.getMaterial().updateTexture(tex);
 
 // const cube2 = new Cube();
 // const cubeNode2 = new Node('Cube2', cube2);

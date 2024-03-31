@@ -3,7 +3,7 @@ import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
 export class Texture {
-  context: GLContext;
+  gl: GLContext;
   image: HTMLImageElement | null = null;
   texture: WebGLTexture;
   isLoaded: boolean = false;
@@ -12,27 +12,27 @@ export class Texture {
   textureUpdated: boolean = false;
   textureURL: string = '';
   constructor(name: string = 'uTexture', textureURL: string = '') {
-    this.context = getGlobalState().gl;
+    this.gl = getGlobalState().gl;
     this.name = name;
     this.textureURL = textureURL;
-    const texture = this.context.createTexture();
+    const texture = this.gl.createTexture();
     invariant(!!texture, 'WebGL createTexture failed');
     this.texture = texture;
     this.loadDefaultTexture();
   }
 
   loadDefaultTexture() {
-    this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
     const initPixel = new Uint8Array([128, 128, 128, 255]);
-    this.context.texImage2D(
-      this.context.TEXTURE_2D,
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
       0,
-      this.context.RGBA,
+      this.gl.RGBA,
       1,
       1,
       0,
-      this.context.RGBA,
-      this.context.UNSIGNED_BYTE,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
       initPixel
     );
   }
@@ -42,43 +42,43 @@ export class Texture {
       const image = new Image();
 
       image.onload = () => {
-        this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
         // this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, 1);
-        this.context.texImage2D(
-          this.context.TEXTURE_2D,
+        this.gl.texImage2D(
+          this.gl.TEXTURE_2D,
           0,
-          this.context.RGBA,
-          this.context.RGBA,
-          this.context.UNSIGNED_BYTE,
+          this.gl.RGBA,
+          this.gl.RGBA,
+          this.gl.UNSIGNED_BYTE,
           image
         );
         if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-          this.context.generateMipmap(this.context.TEXTURE_2D);
-          this.context.texParameteri(
-            this.context.TEXTURE_2D,
-            this.context.TEXTURE_MIN_FILTER,
-            this.context.LINEAR_MIPMAP_LINEAR
+          this.gl.generateMipmap(this.gl.TEXTURE_2D);
+          this.gl.texParameteri(
+            this.gl.TEXTURE_2D,
+            this.gl.TEXTURE_MIN_FILTER,
+            this.gl.LINEAR_MIPMAP_LINEAR
           );
         } else {
-          this.context.texParameteri(
-            this.context.TEXTURE_2D,
-            this.context.TEXTURE_WRAP_S,
-            this.context.CLAMP_TO_EDGE
+          this.gl.texParameteri(
+            this.gl.TEXTURE_2D,
+            this.gl.TEXTURE_WRAP_S,
+            this.gl.CLAMP_TO_EDGE
           );
-          this.context.texParameteri(
-            this.context.TEXTURE_2D,
-            this.context.TEXTURE_WRAP_T,
-            this.context.CLAMP_TO_EDGE
+          this.gl.texParameteri(
+            this.gl.TEXTURE_2D,
+            this.gl.TEXTURE_WRAP_T,
+            this.gl.CLAMP_TO_EDGE
           );
-          this.context.texParameteri(
-            this.context.TEXTURE_2D,
-            this.context.TEXTURE_MIN_FILTER,
-            this.context.NEAREST
+          this.gl.texParameteri(
+            this.gl.TEXTURE_2D,
+            this.gl.TEXTURE_MIN_FILTER,
+            this.gl.NEAREST
           );
-          this.context.texParameteri(
-            this.context.TEXTURE_2D,
-            this.context.TEXTURE_MAG_FILTER,
-            this.context.NEAREST
+          this.gl.texParameteri(
+            this.gl.TEXTURE_2D,
+            this.gl.TEXTURE_MAG_FILTER,
+            this.gl.NEAREST
           );
         }
 
@@ -99,9 +99,9 @@ export class Texture {
   update() {
     invariant(!!this.texture, `Texture ${this.name} not loaded`);
     if (this.textureUpdated) {
-      this.context.activeTexture(this.context.TEXTURE0);
-      this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
-      this.context.uniform1i(this.uniformLocation, 0);
+      this.gl.activeTexture(this.gl.TEXTURE0);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+      this.gl.uniform1i(this.uniformLocation, 0);
       this.textureUpdated = false;
     }
   }
