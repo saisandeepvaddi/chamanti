@@ -37,7 +37,6 @@ export class MeshRenderer implements Transformable {
     }
     const uniforms: Uniform[] = this.material.uniforms;
     const textures: Texture[] = this.material.textures;
-    console.log(textures);
     invariant(
       !!this.mesh.material.vertexShader,
       'MeshRenderer requires a vertexShader'

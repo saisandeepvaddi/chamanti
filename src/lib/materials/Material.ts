@@ -69,11 +69,18 @@ export class Material extends Component {
       !!this._renderObject,
       'Material must be attached to a RenderObject'
     );
-    // find if texture exists and if it doesn't add it or update it
-    const tex = this.textures.find((t) => t.name === texture.name);
+    let tex = this.textures.find((t) => t.name === texture.name);
     if (tex) {
-      // tex.update();
-      this._renderObject.updateTexture(tex);
+      tex = texture;
+      if (tex.textureURL) {
+        tex.loadImage().then(() => {
+          if (tex) {
+            this._renderObject?.updateTexture(tex);
+          }
+        });
+      } else {
+        this._renderObject.updateTexture(tex);
+      }
     } else {
       this.textures.push(texture);
       this._renderObject.textures.push(texture);

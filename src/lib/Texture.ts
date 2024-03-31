@@ -19,9 +19,6 @@ export class Texture {
     invariant(!!texture, 'WebGL createTexture failed');
     this.texture = texture;
     this.loadDefaultTexture();
-    if (this.textureURL) {
-      this.loadImage();
-    }
   }
 
   loadDefaultTexture() {
@@ -41,62 +38,51 @@ export class Texture {
   }
 
   async loadImage() {
-    const image = new Image();
-    // this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
-    // const initPixel = new Uint8Array([0, 0, 0, 255]);
-    // this.context.texImage2D(
-    //   this.context.TEXTURE_2D,
-    //   0,
-    //   this.context.RGBA,
-    //   1,
-    //   1,
-    //   0,
-    //   this.context.RGBA,
-    //   this.context.UNSIGNED_BYTE,
-    //   initPixel
-    // );
+    return new Promise((resolve) => {
+      const image = new Image();
 
-    image.onload = () => {
-      this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
-      this.context.texImage2D(
-        this.context.TEXTURE_2D,
-        0,
-        this.context.RGBA,
-        this.context.RGBA,
-        this.context.UNSIGNED_BYTE,
-        image
-      );
-      if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-        this.context.generateMipmap(this.context.TEXTURE_2D);
-        this.context.texParameteri(
+      image.onload = () => {
+        this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
+        this.context.texImage2D(
           this.context.TEXTURE_2D,
-          this.context.TEXTURE_MIN_FILTER,
-          this.context.LINEAR_MIPMAP_LINEAR
+          0,
+          this.context.RGBA,
+          this.context.RGBA,
+          this.context.UNSIGNED_BYTE,
+          image
         );
-      } else {
-        this.context.texParameteri(
-          this.context.TEXTURE_2D,
-          this.context.TEXTURE_WRAP_S,
-          this.context.CLAMP_TO_EDGE
-        );
-        this.context.texParameteri(
-          this.context.TEXTURE_2D,
-          this.context.TEXTURE_WRAP_T,
-          this.context.CLAMP_TO_EDGE
-        );
-        this.context.texParameteri(
-          this.context.TEXTURE_2D,
-          this.context.TEXTURE_MIN_FILTER,
-          this.context.LINEAR
-        );
-      }
+        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+          this.context.generateMipmap(this.context.TEXTURE_2D);
+          this.context.texParameteri(
+            this.context.TEXTURE_2D,
+            this.context.TEXTURE_MIN_FILTER,
+            this.context.LINEAR_MIPMAP_LINEAR
+          );
+        } else {
+          this.context.texParameteri(
+            this.context.TEXTURE_2D,
+            this.context.TEXTURE_WRAP_S,
+            this.context.CLAMP_TO_EDGE
+          );
+          this.context.texParameteri(
+            this.context.TEXTURE_2D,
+            this.context.TEXTURE_WRAP_T,
+            this.context.CLAMP_TO_EDGE
+          );
+          this.context.texParameteri(
+            this.context.TEXTURE_2D,
+            this.context.TEXTURE_MIN_FILTER,
+            this.context.LINEAR
+          );
+        }
 
-      this.isLoaded = true;
-      this.textureUpdated = true;
-    };
+        this.isLoaded = true;
+        this.textureUpdated = true;
+      };
 
-    image.src = this.textureURL;
-    return this.texture;
+      image.src = this.textureURL;
+      resolve(this.texture);
+    });
   }
 
   setURL(url: string) {
