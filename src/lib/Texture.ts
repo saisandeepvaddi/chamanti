@@ -43,6 +43,7 @@ export class Texture {
 
       image.onload = () => {
         this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
+        // this.context.pixelStorei(this.context.UNPACK_FLIP_Y_WEBGL, 1);
         this.context.texImage2D(
           this.context.TEXTURE_2D,
           0,
@@ -72,7 +73,12 @@ export class Texture {
           this.context.texParameteri(
             this.context.TEXTURE_2D,
             this.context.TEXTURE_MIN_FILTER,
-            this.context.LINEAR
+            this.context.NEAREST
+          );
+          this.context.texParameteri(
+            this.context.TEXTURE_2D,
+            this.context.TEXTURE_MAG_FILTER,
+            this.context.NEAREST
           );
         }
 

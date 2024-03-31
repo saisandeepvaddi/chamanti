@@ -30,8 +30,10 @@ export class Program {
     this.context.compileShader(shader);
     if (!this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)) {
       this.context.deleteShader(shader);
+      const shaderType =
+        type === this.context.VERTEX_SHADER ? 'vertex' : 'fragment';
       throw new Error(
-        `Error compiling ${type} shader: ${this.context.getShaderInfoLog(shader)}`
+        `Error compiling ${shaderType} shader: ${this.context.getShaderInfoLog(shader)}`
       );
     }
     return shader;

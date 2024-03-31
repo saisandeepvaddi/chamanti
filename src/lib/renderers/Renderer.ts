@@ -12,6 +12,20 @@ export class Renderer {
     this.gl = globalState.gl;
     this.scene = globalState.scene;
     this.camera = globalState.camera;
+    this.setupRenderDefaults();
+  }
+
+  setupRenderDefaults() {
+    const [r, g, b, a] = [0.0, 0.0, 0.0, 1.0];
+    this.gl.clearColor(r, g, b, a);
+    this.gl.clearDepth(1.0);
+    this.gl.enable(this.gl.DEPTH_TEST);
+    this.gl.depthFunc(this.gl.LEQUAL);
+    this.gl.enable(this.gl.CULL_FACE);
+    this.gl.cullFace(this.gl.BACK);
+    this.gl.frontFace(this.gl.CCW);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
   }
 
   resizeScreen() {
@@ -47,8 +61,6 @@ export class Renderer {
 
   render(delta: number): void {
     this.resizeScreen();
-    const [r, g, b, a] = [0.0, 0.0, 0.0, 1.0];
-    this.gl.clearColor(r, g, b, a);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     invariant(!!this.scene, 'No scene set.');
     invariant(!!this.camera, 'No camera set.');
