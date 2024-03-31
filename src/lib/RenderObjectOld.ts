@@ -272,10 +272,10 @@ export class RenderObject {
 
   setupTexture(url: string, uniformName: string = 'uTexture') {
     const texture = new Texture(this.context);
-    texture.uniformName = uniformName;
+    texture.name = uniformName;
     const uniformLocation = this.program.getUniformLocation(uniformName);
     invariant(!!uniformLocation, `No uniform found with name ${uniformName}`);
-    texture.load(url).then(() => {
+    texture.loadImage(url).then(() => {
       texture.uniformLocation = uniformLocation;
     });
     this.textureMaps.set(uniformName, texture);

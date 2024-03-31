@@ -8,7 +8,6 @@ export class Mesh extends Component {
   geometry: Geometry;
   material: Material;
   transform: Transform;
-  textureCoords?: number[];
   name: string = 'Mesh';
   isRenderable = true;
   meshRenderer: MeshRenderer;
@@ -17,11 +16,7 @@ export class Mesh extends Component {
     this.transform = new Transform();
     this.geometry = geometry;
     this.material = material;
-    this.meshRenderer = new MeshRenderer(
-      this.geometry,
-      this.material,
-      this.transform
-    );
+    this.meshRenderer = new MeshRenderer(this);
   }
   setName(name: string) {
     this.name = name;

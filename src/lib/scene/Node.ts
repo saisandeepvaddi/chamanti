@@ -1,4 +1,4 @@
-import { Camera } from '..';
+import { Camera, invariant } from '..';
 import { Mesh } from '../meshes/Mesh';
 import { Transform, Transformable } from '../transforms/Transform';
 import { Component } from './Component';
@@ -38,9 +38,6 @@ export class Node implements Transformable {
       this.children.splice(index, 1);
     }
   }
-  setTransform(transform: Transform) {
-    this.transform = transform;
-  }
 
   addComponent(component: Component) {
     if (component instanceof Mesh) {
@@ -49,7 +46,14 @@ export class Node implements Transformable {
 
     this.components.set(component.name, component);
   }
-
+  getMesh() {
+    invariant(!!this.mesh, 'No mesh set.');
+    return this.mesh;
+  }
+  getMaterial() {
+    invariant(!!this.mesh, 'No mesh set.');
+    return this.mesh.material;
+  }
   isRenderable() {
     return this.mesh !== null;
   }

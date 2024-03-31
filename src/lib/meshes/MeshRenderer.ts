@@ -1,23 +1,26 @@
-import { mat4 } from 'gl-matrix';
-import { Attribute, Camera, RenderObject, Uniform } from '..';
+import { Attribute, Camera, RenderObject, Uniform, invariant } from '..';
+import { Texture } from '../Texture';
+
 import { Material } from '../materials/Material';
-import modelFragmentShader from '../shaders/modelFragment.glsl';
-import modelVetexShader from '../shaders/modelVertex.glsl';
 import { getGlobalState } from '../state/global';
 import { Transform, Transformable } from '../transforms/Transform';
 import Geometry from './Geometry';
+import { Mesh } from './Mesh';
 export class MeshRenderer implements Transformable {
-  geometry: Geometry;
-  material: Material;
+  mesh: Mesh;
   transform: Transform;
   camera: Camera;
   _renderObject: RenderObject;
-  constructor(geometry: Geometry, material: Material, transform: Transform) {
-    this.geometry = geometry;
-    this.material = material;
-    this.transform = transform;
+  attributes: Attribute[];
+  geometry: Geometry;
+  material: Material;
+  constructor(mesh: Mesh) {
+    this.mesh = mesh;
+    this.geometry = this.mesh.geometry;
+    this.material = this.mesh.material;
+    this.transform = this.mesh.transform;
     this.camera = getGlobalState().camera;
-    const attributes: Attribute[] = [
+    this.attributes = [
       {
         name: 'aPosition',
         data: this.geometry.vertices,
@@ -25,54 +28,46 @@ export class MeshRenderer implements Transformable {
         indices: this.geometry.indices,
       },
     ];
-    const uniforms: Uniform[] = [
-      {
-        name: 'uViewMatrix',
-        value: this.camera ? this.camera.getViewMatrix() : mat4.create(),
-      },
-      {
-        name: 'uProjectionMatrix',
-        value: this.camera ? this.camera.getProjectionMatrix() : mat4.create(),
-      },
-      {
-        name: 'uModelMatrix',
-        value: mat4.create(),
-      },
-    ];
+    if (this.geometry.textureCoords) {
+      this.attributes.push({
+        name: 'aTexCoord',
+        data: this.geometry.textureCoords,
+        size: 2,
+      });
+    }
+    const uniforms: Uniform[] = this.material.uniforms;
+    const textures: Texture[] = this.material.textures;
+    console.log(textures);
+    invariant(
+      !!this.mesh.material.vertexShader,
+      'MeshRenderer requires a vertexShader'
+    );
+    invariant(
+      !!this.mesh.material.fragmentShader,
+      'MeshRenderer requires a fragmentShader'
+    );
     this._renderObject = new RenderObject(
       {
         name: 'MeshRenderer',
-        vertexShader: modelVetexShader,
-        fragmentShader: modelFragmentShader,
-        attributes,
+        vertexShader: this.mesh.material.vertexShader,
+        fragmentShader: this.mesh.material.fragmentShader,
+        attributes: this.attributes,
         uniforms,
-        textures: [],
+        textures,
       },
       this.transform
     );
+    this.material._renderObject = this._renderObject;
     this._renderObject.setup();
   }
-  updateCamera(camera: Camera) {
-    this.camera = camera;
-    this._renderObject.updateUniform('uViewMatrix', camera.getViewMatrix());
-    this._renderObject.updateUniform(
-      'uProjectionMatrix',
-      camera.getProjectionMatrix()
-    );
-  }
+
   onTransformChanged(transform: Transform): void {
     this.transform = transform;
     this._renderObject.onTransformChanged(transform);
   }
   render(_delta: number) {
-    this._renderObject.updateUniform(
-      'uViewMatrix',
-      this.camera.getViewMatrix()
-    );
-    this._renderObject.updateUniform(
-      'uProjectionMatrix',
-      this.camera.getProjectionMatrix()
-    );
+    // this._renderObject.uniforms = this.material.uniforms;
+    // this._renderObject.textures = this.material.textures;
     this._renderObject.draw();
   }
 }

@@ -1,12 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import {
-  Attribute,
-  BufferObject,
-  TextureMap,
-  Uniform,
-  UniformValue,
-  invariant,
-} from '.';
+import { Attribute, BufferObject, Uniform, UniformValue, invariant } from '.';
 import { Program } from './Program';
 import { Texture } from './Texture';
 import { getGlobalState } from './state/global';
@@ -21,7 +14,7 @@ export class RenderObject {
   gl: WebGL2RenderingContext;
   buffers: Map<string, WebGLBuffer> = new Map();
   vao: WebGLVertexArrayObject | null = null;
-  textures: TextureMap[] = [];
+  textures: Texture[] = [];
   textureMaps: Map<string, Texture | null> = new Map();
   wireframe: boolean = false;
   indexBuffer: WebGLBuffer | null = null;
@@ -236,38 +229,48 @@ export class RenderObject {
     });
   }
 
-  setupTexture(url: string, uniformName: string = 'uTexture') {
-    const texture = new Texture(this.gl);
-    texture.uniformName = uniformName;
-    const uniformLocation = this.program.getUniformLocation(uniformName);
-    invariant(!!uniformLocation, `No uniform found with name ${uniformName}`);
-    texture.load(url).then(() => {
-      texture.uniformLocation = uniformLocation;
-    });
-    this.textureMaps.set(uniformName, texture);
+  setupTexture(texture: Texture) {
+    // const texture =
+    //   typeof tex === 'string' ? new Texture(uniformName, tex) : tex;
+    const uniformLocation = this.program.getUniformLocation(texture.name);
+    invariant(!!uniformLocation, `No uniform found with name ${texture.name}`);
+    texture.uniformLocation = uniformLocation;
+    this.textureMaps.set(texture.name, texture);
+    // texture.loadImage().then(() => {
+    //   texture.uniformLocation = uniformLocation;
+    // });
+    // this.textureMaps.set(uniformName, texture);
   }
 
-  updateTexture(uniformName: string = 'uTexture') {
+  updateTexture(texture: Texture) {
     invariant(
-      !!this.textureMaps.get(uniformName),
-      `Texture: ${uniformName} not setup`
+      !!this.textureMaps.get(texture.name),
+      `Texture: ${texture.name} not setup`
     );
-    this.textureMaps.get(uniformName)?.update();
+    // if (url) {
+    //   this.textureMaps
+    //     .get(uniformName)
+    //     ?.setURL(url)
+    //     ?.then(() => {
+    //       this.textureMaps.get(uniformName)?.update();
+    //     });
+    // } else {
+    //   this.textureMaps.get(uniformName)?.update();
+    // }
+    this.textureMaps.get(texture.name)?.update();
   }
 
   setupTextures() {
     this.textures.forEach((texture) => {
       if (texture) {
-        this.setupTexture(texture.url, texture.name);
+        this.setupTexture(texture);
       }
     });
   }
 
   updateTextures() {
     this.textures.forEach((texture) => {
-      if (texture) {
-        this.updateTexture(texture.name);
-      }
+      this.updateTexture(texture);
     });
   }
 

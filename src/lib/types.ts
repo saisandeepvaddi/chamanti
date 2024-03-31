@@ -1,4 +1,5 @@
 import { mat3, mat4 } from 'gl-matrix';
+import { Texture } from './Texture';
 
 export type WebGL1WithVao = WebGLRenderingContext & {
   createVertexArray: () => WebGLVertexArrayObject | null;
@@ -43,5 +44,5 @@ export type BufferObject = {
   fragmentShader: string;
   attributes?: Attribute[];
   uniforms?: Uniform[];
-  textures?: TextureMap[];
+  textures?: Texture[];
 };

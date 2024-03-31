@@ -1,4 +1,5 @@
 import { GLContext, invariant } from '.';
+import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
 export class Texture {
@@ -6,19 +7,26 @@ export class Texture {
   image: HTMLImageElement | null = null;
   texture: WebGLTexture;
   isLoaded: boolean = false;
-  uniformName: string = 'uTexture';
+  name: string = 'uTexture';
   uniformLocation: WebGLUniformLocation | null = null;
   textureUpdated: boolean = false;
-  constructor(context: GLContext) {
-    this.context = context;
+  textureURL: string = '';
+  constructor(name: string = 'uTexture', textureURL: string = '') {
+    this.context = getGlobalState().gl;
+    this.name = name;
+    this.textureURL = textureURL;
     const texture = this.context.createTexture();
     invariant(!!texture, 'WebGL createTexture failed');
     this.texture = texture;
+    this.loadDefaultTexture();
+    if (this.textureURL) {
+      this.loadImage();
+    }
   }
-  async load(url: string) {
+
+  loadDefaultTexture() {
     this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
-    const image = new Image();
-    const initPixel = new Uint8Array([0, 0, 0, 255]);
+    const initPixel = new Uint8Array([128, 128, 128, 255]);
     this.context.texImage2D(
       this.context.TEXTURE_2D,
       0,
@@ -30,6 +38,23 @@ export class Texture {
       this.context.UNSIGNED_BYTE,
       initPixel
     );
+  }
+
+  async loadImage() {
+    const image = new Image();
+    // this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
+    // const initPixel = new Uint8Array([0, 0, 0, 255]);
+    // this.context.texImage2D(
+    //   this.context.TEXTURE_2D,
+    //   0,
+    //   this.context.RGBA,
+    //   1,
+    //   1,
+    //   0,
+    //   this.context.RGBA,
+    //   this.context.UNSIGNED_BYTE,
+    //   initPixel
+    // );
 
     image.onload = () => {
       this.context.bindTexture(this.context.TEXTURE_2D, this.texture);
@@ -70,12 +95,17 @@ export class Texture {
       this.textureUpdated = true;
     };
 
-    image.src = url;
+    image.src = this.textureURL;
     return this.texture;
   }
 
+  setURL(url: string) {
+    this.textureURL = url;
+    return this.loadImage();
+  }
+
   update() {
-    invariant(!!this.texture, `Texture ${this.uniformName} not loaded`);
+    invariant(!!this.texture, `Texture ${this.name} not loaded`);
     if (this.textureUpdated) {
       this.context.activeTexture(this.context.TEXTURE0);
       this.context.bindTexture(this.context.TEXTURE_2D, this.texture);

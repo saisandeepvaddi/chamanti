@@ -1,3 +1,4 @@
+import { Texture } from './lib/Texture';
 import { Engine } from './lib/engine/Engine';
 import { Cube } from './lib/primitives/Cube';
 import { Node } from './lib/scene/Node';
@@ -30,6 +31,9 @@ const cubeNode = new Node('Cube', cube);
 //   // });
 // };
 activeScene.add(cubeNode);
+const tex = new Texture('uTexture', 'debug_texture.jpg');
+cubeNode.getMaterial().updateTexture(tex);
+// cubeNode.getMaterial().addTexture('uTexture', 'debug_texture.jpg');
 
 const cube2 = new Cube();
 const cubeNode2 = new Node('Cube2', cube2);
