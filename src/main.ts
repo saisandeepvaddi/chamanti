@@ -1,5 +1,6 @@
 import { Texture } from './lib/Texture';
 import { Engine } from './lib/engine/Engine';
+import { Cube } from './lib/primitives/Cube';
 import { Quad } from './lib/primitives/Quad';
 import { Node } from './lib/scene/Node';
 
@@ -13,6 +14,7 @@ engine.start();
 // const cube = new Cube();
 const activeScene = engine.getActiveScene();
 const quadNode = new Node('Quad', new Quad(1, 1));
+const cubeNode = new Node('Cube', new Cube());
 // const times = 0;
 // cubeNode.transform.setScale({
 //   x: 3,
@@ -30,9 +32,9 @@ const quadNode = new Node('Quad', new Quad(1, 1));
 //   //   x: 0.001,
 //   // });
 // };
-activeScene.add(quadNode);
-const tex = new Texture('uTexture', 'debug_texture_2.jpg');
-quadNode.getMaterial().updateTexture(tex);
+activeScene.add(cubeNode);
+const tex = new Texture('uTexture', 'debug_texture.jpg');
+cubeNode.getMaterial().updateTexture(tex);
 
 // const cube2 = new Cube();
 // const cubeNode2 = new Node('Cube2', cube2);
