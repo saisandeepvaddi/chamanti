@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { Attribute, BufferObject, Uniform, UniformValue, invariant } from '.';
-import { Program } from './Program';
-import { Texture } from './Texture';
-import { getGlobalState } from './state/global';
-import { Transform } from './transforms/Transform';
+import { Attribute, BufferObject, Uniform, UniformValue, invariant } from '..';
+import { Program } from '../Program';
+import { Texture } from '../Texture';
+import { getGlobalState } from '../state/global';
+import { Transform } from '../transforms/Transform';
 
 export class RenderObject {
   id = uuid();
