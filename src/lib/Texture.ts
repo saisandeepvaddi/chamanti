@@ -2,23 +2,34 @@ import { GLContext, invariant } from '.';
 import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
+export enum TextureType {
+  BASE_COLOR,
+  NORMAL,
+}
+
+export const textureNames: Record<TextureType, string> = {
+  [TextureType.BASE_COLOR]: 'uBaseTexture',
+  [TextureType.NORMAL]: 'uNormalTexture',
+};
+
 export class Texture {
   gl: GLContext;
   image: HTMLImageElement | null = null;
   texture: WebGLTexture;
   isLoaded: boolean = false;
-  name: string = 'uTexture';
+  name: string = textureNames[TextureType.BASE_COLOR];
   uniformLocation: WebGLUniformLocation | null = null;
   textureUpdated: boolean = false;
-  textureURL: string = '';
-  constructor(name: string = 'uTexture', textureURL: string = '') {
+  src: string = '';
+  type: TextureType = TextureType.BASE_COLOR;
+  constructor(src: string = '', type = TextureType.BASE_COLOR) {
     this.gl = getGlobalState().gl;
-    this.name = name;
-    this.textureURL = textureURL;
+    this.name = textureNames[type];
+    this.type = type;
+    this.src = src;
     const texture = this.gl.createTexture();
     invariant(!!texture, 'WebGL createTexture failed');
     this.texture = texture;
-    this.loadDefaultTexture();
   }
 
   loadDefaultTexture() {
@@ -35,6 +46,9 @@ export class Texture {
       this.gl.UNSIGNED_BYTE,
       initPixel
     );
+    this.isLoaded = true;
+    this.textureUpdated = true;
+    return this;
   }
 
   async loadImage() {
@@ -54,27 +68,12 @@ export class Texture {
         );
         if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
           this.gl.generateMipmap(this.gl.TEXTURE_2D);
-          // this.gl.texParameteri(
-          //   this.gl.TEXTURE_2D,
-          //   this.gl.TEXTURE_WRAP_S,
-          //   this.gl.CLAMP_TO_EDGE
-          // );
-          // this.gl.texParameteri(
-          //   this.gl.TEXTURE_2D,
-          //   this.gl.TEXTURE_WRAP_T,
-          //   this.gl.CLAMP_TO_EDGE
-          // );
+
           this.gl.texParameteri(
             this.gl.TEXTURE_2D,
             this.gl.TEXTURE_MIN_FILTER,
             this.gl.LINEAR_MIPMAP_LINEAR
           );
-
-          // this.gl.texParameteri(
-          //   this.gl.TEXTURE_2D,
-          //   this.gl.TEXTURE_MAG_FILTER,
-          //   this.gl.LINEAR_MIPMAP_LINEAR
-          // );
         } else {
           this.gl.texParameteri(
             this.gl.TEXTURE_2D,
@@ -91,33 +90,28 @@ export class Texture {
             this.gl.TEXTURE_MIN_FILTER,
             this.gl.LINEAR
           );
-          // this.gl.texParameteri(
-          //   this.gl.TEXTURE_2D,
-          //   this.gl.TEXTURE_MAG_FILTER,
-          //   this.gl.NEAREST
-          // );
         }
 
         this.isLoaded = true;
         this.textureUpdated = true;
       };
 
-      image.src = this.textureURL;
+      image.src = this.src;
       resolve(this.texture);
     });
   }
 
   setURL(url: string) {
-    this.textureURL = url;
+    this.src = url;
     return this.loadImage();
   }
 
-  update() {
+  bindTexture() {
     invariant(!!this.texture, `Texture ${this.name} not loaded`);
     if (this.textureUpdated) {
-      this.gl.activeTexture(this.gl.TEXTURE0);
+      this.gl.activeTexture(this.gl.TEXTURE0 + this.type);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-      this.gl.uniform1i(this.uniformLocation, 0);
+      this.gl.uniform1i(this.uniformLocation, this.type);
       this.textureUpdated = false;
     }
   }

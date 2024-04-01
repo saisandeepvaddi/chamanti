@@ -1,11 +1,12 @@
 import { mat4 } from 'gl-matrix';
 import { Camera, RenderObject, Uniform, UniformValue, invariant } from '..';
-import { Texture } from '../Texture';
+import { Texture, TextureType } from '../Texture';
 import { Component } from '../scene/Component';
 import modelFragmentShader from '../shaders/modelFragment.glsl';
 import modelVetexShader from '../shaders/modelVertex.glsl';
 import { getGlobalState } from '../state/global';
 import { Transform } from '../transforms/Transform';
+
 export class Material extends Component {
   name: string;
   transform: Transform;
@@ -13,7 +14,7 @@ export class Material extends Component {
   uniforms: Uniform[] = [];
   vertexShader: string | null = modelVetexShader;
   fragmentShader: string | null = modelFragmentShader;
-  textures: Texture[] = [];
+  textures: Map<TextureType, Texture | null>;
   _renderObject: RenderObject | null = null;
   constructor(name: string = 'Material') {
     super();
@@ -35,7 +36,11 @@ export class Material extends Component {
         value: mat4.create(),
       },
     ];
-    this.textures = [new Texture()];
+    this.textures = new Map();
+    this.textures.set(
+      TextureType.BASE_COLOR,
+      new Texture().loadDefaultTexture()
+    );
   }
 
   addUniform(name: string, value: UniformValue) {
@@ -69,23 +74,30 @@ export class Material extends Component {
       !!this._renderObject,
       'Material must be attached to a RenderObject'
     );
-    let tex = this.textures.find((t) => t.name === texture.name);
-    if (tex) {
-      tex = texture;
-      if (tex.textureURL) {
-        tex.loadImage().then(() => {
-          if (tex) {
-            this._renderObject?.updateTexture(tex);
-          }
-        });
-      } else {
-        this._renderObject.updateTexture(tex);
-      }
-    } else {
-      this.textures.push(texture);
-      this._renderObject.textures.push(texture);
-      this._renderObject.setupTexture(texture);
-    }
+    this.textures.set(texture.type, texture);
+    this._renderObject.textures.set(texture.type, texture);
+    this._renderObject.setupTexture(texture);
+    texture.loadImage().then(() => {
+      this._renderObject?.updateTextures();
+    });
+  }
+
+  updateTextures(textureMaps: Record<TextureType, Texture | null>) {
+    invariant(
+      !!this._renderObject,
+      'Material must be attached to a RenderObject'
+    );
+    this.textures = new Map(Object.entries(textureMaps)) as unknown as Map<
+      TextureType,
+      Texture | null
+    >;
+    this._renderObject.textures = this.textures;
+    this._renderObject.setupTextures();
+    Promise.all(
+      Array.from(this.textures.values()).map((t) => t?.loadImage())
+    ).then(() => {
+      this._renderObject?.updateTextures();
+    });
   }
 
   onTransformChanged(transform: Transform): void {

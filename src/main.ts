@@ -1,4 +1,4 @@
-import { Texture } from './lib/Texture';
+import { Texture, TextureType } from './lib/Texture';
 import { Engine } from './lib/engine/Engine';
 import { Cube } from './lib/primitives/Cube';
 import { Quad } from './lib/primitives/Quad';
@@ -33,29 +33,23 @@ const cubeNode = new Node('Cube', new Cube());
 //   // });
 // };
 activeScene.add(cubeNode);
-const tex = new Texture('uTexture', 'debug_texture.jpg');
-cubeNode.getMaterial().updateTexture(tex);
+// const tex = new Texture('debug_texture.jpg');
+// cubeNode.getMaterial().updateTexture(tex);
 
-// const cube2 = new Cube();
-// const cubeNode2 = new Node('Cube2', cube2);
-// cubeNode2.transform
-//   .setScale({
-//     x: 0.25,
-//     y: 0.25,
-//     z: 0.25,
-//   })
-//   .setPosition({
-//     x: 0.5,
-//     y: 0.5,
-//     z: 0.5,
-//   });
+const baseTexture = new Texture(
+  'textures/RoofShinglesOld002/RoofShinglesOld002_COL_2K_METALNESS.png',
+  TextureType.BASE_COLOR
+);
 
-// activeScene.add(cubeNode2);
+const normalTexture = new Texture(
+  'textures/RoofShinglesOld002/RoofShinglesOld002_NRM_2K_METALNESS.png',
+  TextureType.NORMAL
+);
 
-// cubeNode2.tick = (self: Node, deltaTime: number) => {
-//   self.transform.updateRotationBy({
-//     x: 0.1 * deltaTime,
-//     y: 0.1 * deltaTime,
-//     z: 0.1 * deltaTime,
-//   });
-// };
+// cubeNode.getMaterial().updateTexture(baseTexture);
+// cubeNode.getMaterial().updateTexture(normalTexture);
+
+cubeNode.getMaterial().updateTextures({
+  [TextureType.BASE_COLOR]: baseTexture,
+  [TextureType.NORMAL]: normalTexture,
+});

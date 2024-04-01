@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 public/texture.*
+public/textures
 sample
 dist

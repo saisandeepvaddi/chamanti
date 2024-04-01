@@ -1,5 +1,6 @@
 import { Attribute, Camera, RenderObject, Uniform, invariant } from '..';
 import { Texture } from '../Texture';
+import { TextureType } from './../Texture';
 
 import { Material } from '../materials/Material';
 import { getGlobalState } from '../state/global';
@@ -36,7 +37,7 @@ export class MeshRenderer implements Transformable {
       });
     }
     const uniforms: Uniform[] = this.material.uniforms;
-    const textures: Texture[] = this.material.textures;
+    const textures: Map<TextureType, Texture | null> = this.material.textures;
     invariant(
       !!this.mesh.material.vertexShader,
       'MeshRenderer requires a vertexShader'

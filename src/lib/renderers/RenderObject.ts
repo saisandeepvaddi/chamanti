@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { Attribute, BufferObject, Uniform, UniformValue, invariant } from '..';
 import { Program } from '../Program';
-import { Texture } from '../Texture';
+import { Texture, TextureType } from '../Texture';
 import { getGlobalState } from '../state/global';
 import { Transform } from '../transforms/Transform';
 
@@ -14,7 +14,7 @@ export class RenderObject {
   gl: WebGL2RenderingContext;
   buffers: Map<string, WebGLBuffer> = new Map();
   vao: WebGLVertexArrayObject | null = null;
-  textures: Texture[] = [];
+  textures: Map<TextureType, Texture | null> = new Map();
   textureMaps: Map<string, Texture | null> = new Map();
   wireframe: boolean = false;
   indexBuffer: WebGLBuffer | null = null;
@@ -42,7 +42,7 @@ export class RenderObject {
     this.name = name;
     this.attributes = attributes ?? [];
     this.uniforms = uniforms ?? [];
-    this.textures = textures ?? [];
+    this.textures = new Map(textures ?? []);
 
     this.transform = transform;
   }
@@ -230,34 +230,30 @@ export class RenderObject {
   }
 
   setupTexture(texture: Texture) {
-    // const texture =
-    //   typeof tex === 'string' ? new Texture(uniformName, tex) : tex;
     const uniformLocation = this.program.getUniformLocation(texture.name);
-    invariant(!!uniformLocation, `No uniform found with name ${texture.name}`);
-    texture.uniformLocation = uniformLocation;
+    // invariant(
+    //   !!uniformLocation,
+    //   `No texture uniform found with name ${texture.name}`
+    // );
     this.textureMaps.set(texture.name, texture);
-    // texture.loadImage().then(() => {
-    //   texture.uniformLocation = uniformLocation;
-    // });
-    // this.textureMaps.set(uniformName, texture);
+    texture.uniformLocation = uniformLocation;
   }
 
-  updateTexture(texture: Texture) {
-    invariant(
-      !!this.textureMaps.get(texture.name),
-      `Texture: ${texture.name} not setup`
-    );
-    // if (url) {
-    //   this.textureMaps
-    //     .get(uniformName)
-    //     ?.setURL(url)
-    //     ?.then(() => {
-    //       this.textureMaps.get(uniformName)?.update();
-    //     });
-    // } else {
-    //   this.textureMaps.get(uniformName)?.update();
-    // }
-    this.textureMaps.get(texture.name)?.update();
+  updateTextures() {
+    // invariant(
+    //   !!this.textureMaps.get(texture.name),
+    //   `Texture: ${texture.name} not setup`
+    // );
+
+    let textureUnit = 0;
+    this.textureMaps.forEach((texture) => {
+      if (texture && texture.uniformLocation !== null) {
+        this.gl.activeTexture(this.gl.TEXTURE0 + textureUnit);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, texture.texture);
+        this.gl.uniform1i(texture.uniformLocation, textureUnit);
+        textureUnit++;
+      }
+    });
   }
 
   setupTextures() {
@@ -265,12 +261,6 @@ export class RenderObject {
       if (texture) {
         this.setupTexture(texture);
       }
-    });
-  }
-
-  updateTextures() {
-    this.textures.forEach((texture) => {
-      this.updateTexture(texture);
     });
   }
 
