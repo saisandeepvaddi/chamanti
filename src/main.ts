@@ -1,4 +1,4 @@
-import { Texture, TextureType } from './lib/Texture';
+import { Texture } from './lib/Texture';
 import { Engine } from './lib/engine/Engine';
 import { Cube } from './lib/primitives/Cube';
 import { Quad } from './lib/primitives/Quad';
@@ -38,18 +38,18 @@ activeScene.add(cubeNode);
 
 const baseTexture = new Texture(
   'textures/RoofShinglesOld002/RoofShinglesOld002_COL_2K_METALNESS.png',
-  TextureType.BASE_COLOR
+  'baseColor'
 );
 
 const normalTexture = new Texture(
   'textures/RoofShinglesOld002/RoofShinglesOld002_NRM_2K_METALNESS.png',
-  TextureType.NORMAL
+  'normal'
 );
 
 // cubeNode.getMaterial().updateTexture(baseTexture);
 // cubeNode.getMaterial().updateTexture(normalTexture);
 
 cubeNode.getMaterial().updateTextures({
-  [TextureType.BASE_COLOR]: baseTexture,
-  [TextureType.NORMAL]: normalTexture,
+  baseColor: baseTexture,
+  normal: normalTexture,
 });

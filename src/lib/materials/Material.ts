@@ -37,10 +37,7 @@ export class Material extends Component {
       },
     ];
     this.textures = new Map();
-    this.textures.set(
-      TextureType.BASE_COLOR,
-      new Texture().loadDefaultTexture()
-    );
+    this.textures.set('baseColor', new Texture().loadDefaultTexture());
   }
 
   addUniform(name: string, value: UniformValue) {

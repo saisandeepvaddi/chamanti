@@ -2,14 +2,11 @@ import { GLContext, invariant } from '.';
 import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
-export enum TextureType {
-  BASE_COLOR,
-  NORMAL,
-}
+export type TextureType = 'baseColor' | 'normal';
 
-export const textureNames: Record<TextureType, string> = {
-  [TextureType.BASE_COLOR]: 'uBaseTexture',
-  [TextureType.NORMAL]: 'uNormalTexture',
+export const textureUniforms: Record<TextureType, string> = {
+  baseColor: 'uBaseTexture',
+  normal: 'uNormalTexture',
 };
 
 export class Texture {
@@ -17,14 +14,14 @@ export class Texture {
   image: HTMLImageElement | null = null;
   texture: WebGLTexture;
   isLoaded: boolean = false;
-  name: string = textureNames[TextureType.BASE_COLOR];
+  name: string = textureUniforms['baseColor'];
   uniformLocation: WebGLUniformLocation | null = null;
   textureUpdated: boolean = false;
   src: string = '';
-  type: TextureType = TextureType.BASE_COLOR;
-  constructor(src: string = '', type = TextureType.BASE_COLOR) {
+  type: TextureType = 'baseColor';
+  constructor(src: string = '', type: TextureType = 'baseColor') {
     this.gl = getGlobalState().gl;
-    this.name = textureNames[type];
+    this.name = textureUniforms[type];
     this.type = type;
     this.src = src;
     const texture = this.gl.createTexture();
@@ -99,20 +96,5 @@ export class Texture {
       image.src = this.src;
       resolve(this.texture);
     });
-  }
-
-  setURL(url: string) {
-    this.src = url;
-    return this.loadImage();
-  }
-
-  bindTexture() {
-    invariant(!!this.texture, `Texture ${this.name} not loaded`);
-    if (this.textureUpdated) {
-      this.gl.activeTexture(this.gl.TEXTURE0 + this.type);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-      this.gl.uniform1i(this.uniformLocation, this.type);
-      this.textureUpdated = false;
-    }
   }
 }
