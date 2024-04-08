@@ -12,9 +12,11 @@ const engine = new Engine(canvas);
 engine.start();
 
 // const cube = new Cube();
-const activeScene = engine.getActiveScene();
-const quadNode = new Node('Quad', new Quad(1, 1));
+const scene = engine.getActiveScene();
+const quadNode = new Node('Quad', new Quad(2, 2));
+// scene.add(quadNode);
 const cubeNode = new Node('Cube', new Cube());
+scene.add(cubeNode);
 // const times = 0;
 // cubeNode.transform.setScale({
 //   x: 3,
@@ -32,7 +34,7 @@ const cubeNode = new Node('Cube', new Cube());
 //   //   x: 0.001,
 //   // });
 // };
-activeScene.add(cubeNode);
+// scene.add(cubeNode);
 // const tex = new Texture('debug_texture.jpg');
 // cubeNode.getMaterial().updateTexture(tex);
 
@@ -49,7 +51,7 @@ const normalTexture = new Texture(
 // cubeNode.getMaterial().updateTexture(baseTexture);
 // cubeNode.getMaterial().updateTexture(normalTexture);
 
-cubeNode.getMaterial().updateTextures({
-  baseColor: baseTexture,
-  normal: normalTexture,
-});
+// quadNode.getMaterial().updateTextures({
+//   baseColor: baseTexture,
+//   normal: normalTexture,
+// });

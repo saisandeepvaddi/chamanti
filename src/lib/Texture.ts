@@ -1,12 +1,16 @@
 import { GLContext, invariant } from '.';
+import {
+  BASE_TEXTURE_UNIFORM,
+  NORMAL_TEXTURE_UNIFORM,
+} from './shaders/uniform_constants';
 import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
 export type TextureType = 'baseColor' | 'normal';
 
 export const textureUniforms: Record<TextureType, string> = {
-  baseColor: 'uBaseTexture',
-  normal: 'uNormalTexture',
+  baseColor: BASE_TEXTURE_UNIFORM,
+  normal: NORMAL_TEXTURE_UNIFORM,
 };
 
 export class Texture {
@@ -31,7 +35,7 @@ export class Texture {
 
   loadDefaultTexture() {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-    const initPixel = new Uint8Array([128, 128, 128, 255]);
+    const initPixel = new Uint8Array([255, 0, 0, 255]);
     this.gl.texImage2D(
       this.gl.TEXTURE_2D,
       0,

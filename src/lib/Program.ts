@@ -29,12 +29,11 @@ export class Program {
     this.context.shaderSource(shader, source);
     this.context.compileShader(shader);
     if (!this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)) {
-      this.context.deleteShader(shader);
       const shaderType =
         type === this.context.VERTEX_SHADER ? 'vertex' : 'fragment';
-      throw new Error(
-        `Error compiling ${shaderType} shader: ${this.context.getShaderInfoLog(shader)}`
-      );
+      const shaderLog = this.context.getShaderInfoLog(shader);
+      this.context.deleteShader(shader);
+      throw new Error(`Error compiling ${shaderType} shader: ${shaderLog}`);
     }
     return shader;
   }
@@ -52,9 +51,8 @@ export class Program {
     this.context.linkProgram(program);
 
     if (!this.context.getProgramParameter(program, this.context.LINK_STATUS)) {
-      throw new Error(
-        `Error linking webgl program: ${this.context.getProgramInfoLog(this.program)}`
-      );
+      const log = this.context.getProgramInfoLog(this.program);
+      throw new Error(`Error linking webgl program: ${log}`);
     }
 
     return program;

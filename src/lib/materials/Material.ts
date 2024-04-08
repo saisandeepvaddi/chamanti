@@ -2,18 +2,24 @@ import { mat4 } from 'gl-matrix';
 import { Camera, RenderObject, Uniform, UniformValue, invariant } from '..';
 import { Texture, TextureType } from '../Texture';
 import { Component } from '../scene/Component';
-import modelFragmentShader from '../shaders/modelFragment.glsl';
-import modelVetexShader from '../shaders/modelVertex.glsl';
+import { SHADER_TYPE, Shader } from '../shaders/Shader';
+import {
+  MODEL_MATRIX_UNIFORM,
+  PROJECTION_MATRIX_UNIFORM,
+  VIEW_MATRIX_UNIFORM,
+} from '../shaders/uniform_constants';
 import { getGlobalState } from '../state/global';
 import { Transform } from '../transforms/Transform';
+import modelFragmentShader from './modelFragment.glsl';
+import modelVetexShader from './modelVertex.glsl';
 
 export class Material extends Component {
   name: string;
   transform: Transform;
   camera: Camera;
   uniforms: Uniform[] = [];
-  vertexShader: string | null = modelVetexShader;
-  fragmentShader: string | null = modelFragmentShader;
+  vertexShader: string;
+  fragmentShader: string;
   textures: Map<TextureType, Texture | null>;
   _renderObject: RenderObject | null = null;
   constructor(name: string = 'Material') {
@@ -21,23 +27,34 @@ export class Material extends Component {
     this.name = name;
     this.transform = new Transform();
     this.camera = getGlobalState().camera;
+    this.vertexShader = new Shader(
+      SHADER_TYPE.VERTEX,
+      modelVetexShader
+    ).getShaderSource();
+
+    this.fragmentShader = new Shader(
+      SHADER_TYPE.FRAGMENT,
+      modelFragmentShader
+    ).getShaderSource();
+
+    console.log(this.vertexShader);
+    console.log(this.fragmentShader);
 
     this.uniforms = [
       {
-        name: 'uViewMatrix',
+        name: VIEW_MATRIX_UNIFORM,
         value: this.camera ? this.camera.getViewMatrix() : mat4.create(),
       },
       {
-        name: 'uProjectionMatrix',
+        name: PROJECTION_MATRIX_UNIFORM,
         value: this.camera ? this.camera.getProjectionMatrix() : mat4.create(),
       },
       {
-        name: 'uModelMatrix',
+        name: MODEL_MATRIX_UNIFORM,
         value: mat4.create(),
       },
     ];
-    this.textures = new Map();
-    this.textures.set('baseColor', new Texture().loadDefaultTexture());
+    this.textures = new Map<TextureType, Texture | null>();
   }
 
   addUniform(name: string, value: UniformValue) {

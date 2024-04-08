@@ -3,6 +3,11 @@ import { Texture } from '../Texture';
 import { TextureType } from './../Texture';
 
 import { Material } from '../materials/Material';
+import {
+  NORMAL_ATTRIBUTE,
+  POSITION_ATTRIBUTE,
+  TEXCOORD_ATTRIBUTE,
+} from '../shaders/attribute_constants';
 import { getGlobalState } from '../state/global';
 import { Transform, Transformable } from '../transforms/Transform';
 import Geometry from './Geometry';
@@ -23,7 +28,7 @@ export class MeshRenderer implements Transformable {
     this.camera = getGlobalState().camera;
     this.attributes = [
       {
-        name: 'aPosition',
+        name: POSITION_ATTRIBUTE,
         data: this.geometry.vertices,
         size: 3,
         indices: this.geometry.indices,
@@ -31,9 +36,16 @@ export class MeshRenderer implements Transformable {
     ];
     if (this.geometry.textureCoords) {
       this.attributes.push({
-        name: 'aTexCoord',
+        name: TEXCOORD_ATTRIBUTE,
         data: this.geometry.textureCoords,
         size: 2,
+      });
+    }
+    if (this.geometry.normals) {
+      this.attributes.push({
+        name: NORMAL_ATTRIBUTE,
+        data: this.geometry.normals,
+        size: 3,
       });
     }
     const uniforms: Uniform[] = this.material.uniforms;
