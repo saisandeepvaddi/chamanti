@@ -1,7 +1,7 @@
+import { vec4 } from 'gl-matrix';
 import { Texture } from './lib/Texture';
 import { Engine } from './lib/engine/Engine';
 import { Cube } from './lib/primitives/Cube';
-import { Quad } from './lib/primitives/Quad';
 import { Node } from './lib/scene/Node';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -13,10 +13,14 @@ engine.start();
 
 // const cube = new Cube();
 const scene = engine.getActiveScene();
-const quadNode = new Node('Quad', new Quad(2, 2));
+// const quadNode = new Node('Quad', new Quad(2, 2));
 // scene.add(quadNode);
-const cubeNode = new Node('Cube', new Cube());
+
+const cube = new Cube();
+const cubeNode = new Node('Cube', cube);
 scene.add(cubeNode);
+
+cube.material.setColor(vec4.fromValues(1.0, 0.0, 0.0, 1.0));
 // const times = 0;
 // cubeNode.transform.setScale({
 //   x: 3,
@@ -39,19 +43,24 @@ scene.add(cubeNode);
 // cubeNode.getMaterial().updateTexture(tex);
 
 const baseTexture = new Texture(
-  'textures/RoofShinglesOld002/RoofShinglesOld002_COL_2K_METALNESS.png',
-  'baseColor'
+  'diffuse',
+  'textures/RoofShinglesOld002/RoofShinglesOld002_COL_2K_METALNESS.png'
 );
 
 const normalTexture = new Texture(
-  'textures/RoofShinglesOld002/RoofShinglesOld002_NRM_2K_METALNESS.png',
-  'normal'
+  'normal',
+  'textures/RoofShinglesOld002/RoofShinglesOld002_NRM_2K_METALNESS.png'
 );
+
+cubeNode.getMaterial().updateTextures({
+  diffuse: baseTexture,
+  normal: normalTexture,
+});
 
 // cubeNode.getMaterial().updateTexture(baseTexture);
 // cubeNode.getMaterial().updateTexture(normalTexture);
 
 // quadNode.getMaterial().updateTextures({
-//   baseColor: baseTexture,
+//   diffuse: baseTexture,
 //   normal: normalTexture,
 // });

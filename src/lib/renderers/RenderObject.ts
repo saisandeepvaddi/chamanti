@@ -321,4 +321,15 @@ export class RenderObject {
       this.gl.deleteBuffer(buffer);
     });
   }
+  refreshProgramWithNewShaders(vertexShader: string, fragmentShader: string) {
+    this.program.delete();
+    this.vertexShaderSource = vertexShader;
+    this.fragmentShaderSource = fragmentShader;
+    this.program = new Program(
+      this.gl,
+      this.vertexShaderSource,
+      this.fragmentShaderSource
+    );
+    this.setup();
+  }
 }

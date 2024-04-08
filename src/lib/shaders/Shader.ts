@@ -5,6 +5,7 @@ import {
 } from './attribute_constants';
 import {
   MODEL_MATRIX_UNIFORM,
+  NORMAL_MATRIX_UNIFORM,
   PROJECTION_MATRIX_UNIFORM,
   VIEW_MATRIX_UNIFORM,
 } from './uniform_constants';
@@ -21,9 +22,10 @@ export class Shader {
   type: SHADER_TYPE;
   defines: string[] = [];
   shaderSource: string = '';
-  constructor(type: SHADER_TYPE, shaderSource: string) {
+  constructor(type: SHADER_TYPE, shaderSource: string, defines: string[] = []) {
     this.type = type;
     this.shaderSource = shaderSource;
+    this.defines = defines;
   }
   createShaderString() {
     let shaderString = '';
@@ -42,6 +44,7 @@ export class Shader {
       shaderString += `uniform mat4 ${VIEW_MATRIX_UNIFORM};\n`;
       shaderString += `uniform mat4 ${PROJECTION_MATRIX_UNIFORM};\n`;
       shaderString += `uniform mat4 ${MODEL_MATRIX_UNIFORM};\n`;
+      shaderString += `uniform mat3 ${NORMAL_MATRIX_UNIFORM};\n`;
     }
 
     if (this.type === SHADER_TYPE.FRAGMENT) {
@@ -52,7 +55,7 @@ export class Shader {
     }
 
     this.defines.forEach((define) => {
-      shaderString += `${define}\n`;
+      shaderString += `#define ${define}\n`;
     });
 
     shaderString += this.shaderSource;
@@ -61,6 +64,7 @@ export class Shader {
   }
   addDefine(define: string) {
     this.defines.push(define);
+    return this;
   }
 
   getShaderSource() {

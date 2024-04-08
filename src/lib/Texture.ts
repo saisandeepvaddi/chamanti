@@ -1,16 +1,22 @@
 import { GLContext, invariant } from '.';
+import { USE_DIFFUSE_MAP, USE_NORMAL_MAP } from './shaders/define_constants';
 import {
-  BASE_TEXTURE_UNIFORM,
-  NORMAL_TEXTURE_UNIFORM,
+  DIFFUSE_MAP_UNIFORM,
+  NORMAL_MAP_UNIFORM,
 } from './shaders/uniform_constants';
 import { getGlobalState } from './state/global';
 import { isPowerOf2 } from './utils/math';
 
-export type TextureType = 'baseColor' | 'normal';
+export type TextureType = 'diffuse' | 'normal';
 
 export const textureUniforms: Record<TextureType, string> = {
-  baseColor: BASE_TEXTURE_UNIFORM,
-  normal: NORMAL_TEXTURE_UNIFORM,
+  diffuse: DIFFUSE_MAP_UNIFORM,
+  normal: NORMAL_MAP_UNIFORM,
+};
+
+export const textureDefines: Record<TextureType, string> = {
+  diffuse: USE_DIFFUSE_MAP,
+  normal: USE_NORMAL_MAP,
 };
 
 export class Texture {
@@ -18,12 +24,12 @@ export class Texture {
   image: HTMLImageElement | null = null;
   texture: WebGLTexture;
   isLoaded: boolean = false;
-  name: string = textureUniforms['baseColor'];
+  name: string = textureUniforms['diffuse'];
   uniformLocation: WebGLUniformLocation | null = null;
   textureUpdated: boolean = false;
   src: string = '';
-  type: TextureType = 'baseColor';
-  constructor(src: string = '', type: TextureType = 'baseColor') {
+  type: TextureType = 'diffuse';
+  constructor(type: TextureType = 'diffuse', src = '') {
     this.gl = getGlobalState().gl;
     this.name = textureUniforms[type];
     this.type = type;
@@ -52,7 +58,7 @@ export class Texture {
     return this;
   }
 
-  async loadImage() {
+  async loadImage(): Promise<Texture> {
     return new Promise((resolve) => {
       const image = new Image();
 
@@ -98,7 +104,7 @@ export class Texture {
       };
 
       image.src = this.src;
-      resolve(this.texture);
+      resolve(this);
     });
   }
 }

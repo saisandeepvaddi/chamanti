@@ -61,8 +61,8 @@ export class MeshRenderer implements Transformable {
     this._renderObject = new RenderObject(
       {
         name: 'MeshRenderer',
-        vertexShader: this.mesh.material.vertexShader,
-        fragmentShader: this.mesh.material.fragmentShader,
+        vertexShader: this.mesh.material.vertexShader.getShaderSource(),
+        fragmentShader: this.mesh.material.fragmentShader.getShaderSource(),
         attributes: this.attributes,
         uniforms,
         textures,

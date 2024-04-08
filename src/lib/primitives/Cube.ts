@@ -81,6 +81,8 @@ const textureCoordinates = [
   0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
 ];
 
+const cubeNormals = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
+
 export class Cube extends Mesh {
   constructor(height: number = 1, width: number = 1, depth: number = 1) {
     const scaledVertexData = positions.map((vertex, index) => {
@@ -95,7 +97,8 @@ export class Cube extends Mesh {
     const geometry = new Geometry(
       scaledVertexData,
       indexData,
-      textureCoordinates
+      textureCoordinates,
+      cubeNormals
     );
     const material = new Material();
 

@@ -1,10 +1,13 @@
-import { mat4 } from 'gl-matrix';
+import { mat3, mat4, vec4 } from 'gl-matrix';
+import { v4 as uuidv4 } from 'uuid';
 import { Camera, RenderObject, Uniform, UniformValue, invariant } from '..';
-import { Texture, TextureType } from '../Texture';
+import { Texture, TextureType, textureDefines } from '../Texture';
 import { Component } from '../scene/Component';
 import { SHADER_TYPE, Shader } from '../shaders/Shader';
 import {
+  BASIC_COLOR_UNIFORM,
   MODEL_MATRIX_UNIFORM,
+  NORMAL_MATRIX_UNIFORM,
   PROJECTION_MATRIX_UNIFORM,
   VIEW_MATRIX_UNIFORM,
 } from '../shaders/uniform_constants';
@@ -13,32 +16,49 @@ import { Transform } from '../transforms/Transform';
 import modelFragmentShader from './modelFragment.glsl';
 import modelVetexShader from './modelVertex.glsl';
 
+export type MaterialOptions = {
+  name?: string;
+  color?: vec4;
+  vertexShader?: string;
+  fragmentShader?: string;
+  textures?: Map<TextureType, Texture | null>;
+};
 export class Material extends Component {
+  id: string;
   name: string;
   transform: Transform;
   camera: Camera;
   uniforms: Uniform[] = [];
-  vertexShader: string;
-  fragmentShader: string;
+  vertexShader: Shader;
+  fragmentShader: Shader;
+  private vertexShaderSource: string;
+  private fragmentShaderSource: string;
   textures: Map<TextureType, Texture | null>;
   _renderObject: RenderObject | null = null;
-  constructor(name: string = 'Material') {
+  modelMatrix: mat4 = mat4.create();
+  normalMatrix: mat3 = mat3.create();
+  color: vec4 = vec4.fromValues(0.5, 0.5, 0.5, 1.0);
+  vertexDefines: string[] = [];
+  fragmentDefines: string[] = [];
+  constructor(options: MaterialOptions = {}) {
     super();
-    this.name = name;
-    this.transform = new Transform();
-    this.camera = getGlobalState().camera;
+    this.id = uuidv4();
+    this.name = options.name ?? 'Material_' + this.id;
+    this.color = options.color ?? this.color;
+    this.vertexShaderSource = options.vertexShader ?? modelVetexShader;
+    this.fragmentShaderSource = options.fragmentShader ?? modelFragmentShader;
     this.vertexShader = new Shader(
       SHADER_TYPE.VERTEX,
-      modelVetexShader
-    ).getShaderSource();
-
+      this.vertexShaderSource,
+      this.vertexDefines
+    );
     this.fragmentShader = new Shader(
       SHADER_TYPE.FRAGMENT,
-      modelFragmentShader
-    ).getShaderSource();
-
-    console.log(this.vertexShader);
-    console.log(this.fragmentShader);
+      this.fragmentShaderSource,
+      this.fragmentDefines
+    );
+    this.transform = new Transform();
+    this.camera = getGlobalState().camera;
 
     this.uniforms = [
       {
@@ -51,10 +71,28 @@ export class Material extends Component {
       },
       {
         name: MODEL_MATRIX_UNIFORM,
-        value: mat4.create(),
+        value: this.modelMatrix,
+      },
+      {
+        name: NORMAL_MATRIX_UNIFORM,
+        value: this.normalMatrix,
+      },
+      {
+        name: BASIC_COLOR_UNIFORM,
+        value: this.color,
       },
     ];
     this.textures = new Map<TextureType, Texture | null>();
+  }
+
+  setColor(color: vec4) {
+    this.color = color;
+    this.updateUniform(BASIC_COLOR_UNIFORM, color);
+  }
+
+  addDiffuseTexture(src: string) {
+    const texture = new Texture('diffuse', src);
+    this.textures.set('diffuse', texture);
   }
 
   addUniform(name: string, value: UniformValue) {
@@ -106,11 +144,33 @@ export class Material extends Component {
       Texture | null
     >;
     this._renderObject.textures = this.textures;
-    this._renderObject.setupTextures();
     Promise.all(
       Array.from(this.textures.values()).map((t) => t?.loadImage())
-    ).then(() => {
-      this._renderObject?.updateTextures();
+    ).then((textures) => {
+      // update their defines
+      this.fragmentDefines = [];
+      (textures ?? []).forEach((t) => {
+        if (t) {
+          this.fragmentDefines.push(textureDefines[t.type]);
+        }
+      });
+
+      this.vertexShader = new Shader(
+        SHADER_TYPE.VERTEX,
+        this.vertexShaderSource,
+        this.vertexDefines
+      );
+
+      this.fragmentShader = new Shader(
+        SHADER_TYPE.FRAGMENT,
+        this.fragmentShaderSource,
+        this.fragmentDefines
+      );
+
+      this._renderObject?.refreshProgramWithNewShaders(
+        this.vertexShader.getShaderSource(),
+        this.fragmentShader.getShaderSource()
+      );
     });
   }
 
